@@ -1,0 +1,417 @@
+================================================================================
+PEBBLEBROOK INTERVIEW — MASTER PREP DOCUMENT
+Associate, Enterprise Solutions & Automation
+================================================================================
+Candidate: Dawn Kim
+Interviewers:
+  - Matthew Klein — Senior Director, Operational Excellence & Innovation
+  - Huan Tran    — Manager of Enterprise AI Solutions
+Format: 45-minute virtual interview, screen-share walkthrough
+Deliverable Source: 90-minute BI forecasting project (no formal deliverable
+                    required — walk through scratchpad/code/spreadsheet logic)
+================================================================================
+
+
+================================================================================
+PART 1 — WHY YOU WILL WIN THIS JOB (JD DECODING)
+================================================================================
+
+THE JD'S HIDDEN SIGNAL:
+Pebblebrook is NOT hiring a traditional data analyst. The JD openly declares:
+  - "Agentic Practitioner, Not AI-Dependent"
+  - "AI as leverage, not as autopilot"
+  - "Force multiplier" — one person doing the work of ten
+  - "Shift from syntax-level coding to architectural problem-solving"
+
+TRANSLATION: They want someone who ORCHESTRATES AI agents with a verification
+pipeline — not someone who hand-codes pandas or lets AI run on autopilot.
+
+COVER LETTER QUESTION #3 (memorize this signal):
+  "Walk us through your current 'AI-augmented' development workflow. How do
+   you use LLMs or agents to accelerate your building process, and more
+   importantly, how do you audit the AI's output for accuracy and security?"
+
+>>> Your /reconcile-data skill is the living answer to this question. <<<
+
+CRITICAL RULE: Never say "the AI assistant helped me plan this." The entire
+.claude/ workspace, the 5-step loop, and the audit skills are YOUR
+architecture — your personal mental model for orchestrating AI. Own it
+completely.
+
+
+================================================================================
+PART 2 — THE OPENING ELEVATOR PITCH (2 MINUTES, MEMORIZE)
+================================================================================
+
+"Hi Matthew and Huan. Before walking through my code, I want to explain HOW
+I approached this 90-minute forecasting challenge, because it reflects my
+core philosophy as a builder.
+
+On my resume, you'll see I recently launched an app called 'Dining Dash'
+from zero to the App Store in just one week using Claude Code and Cursor.
+I also founded OMEL AI, where I built safety layers to intercept AI
+hallucinations for enterprise chatbots.
+
+I brought that same 'Agentic Practitioner' mindset to this BI project.
+Instead of spending 90 minutes hand-coding pandas syntax, I acted as an
+orchestrator. I designed a structured .claude workspace with dedicated
+agents for the data pipeline and business strategy, and crucially, I built
+a /reconcile-data skill to audit the AI's output for data integrity —
+exactly like the AI safety layers I built at OMEL AI. Let me share my
+screen and show you the workflow."
+
+
+================================================================================
+PART 3 — YOUR SIGNATURE WORKFLOW: SPEC → DECOMPOSE → GENERATE → VERIFY → COMMIT
+================================================================================
+
+This is YOUR personal methodology. Explain it like a senior architect.
+
+1. SPEC (Define constraints first)
+   - Set up CLAUDE.md with business rules BEFORE any code is written
+   - Rules: no black-box deep learning, explainable models only, modular FastAPI-ready code
+   - Two agents: pipeline-architect, business-strategist
+   - One skill: /reconcile-data for data integrity audits
+
+2. DECOMPOSE (Break into independent, auditable units)
+   - Stage 1: Data merge (load + join)
+   - Stage 2: Data validation (reconciliation gate)
+   - Stage 3: Forecast model (OTB + pickup + event weight)
+   - Stage 4: Business translation (presentation)
+   - Why: prevents hallucination cascades; each stage is testable on its own
+
+3. GENERATE (Use AI as leverage, not autopilot)
+   - Delegate boilerplate (pandas joins, chart scaffolding) to @pipeline-architect
+   - YOU define the architecture; AI handles syntax
+   - This is the "force multiplier" the JD demands
+
+4. VERIFY (The single most important stage — YOUR differentiator)
+   - Run /reconcile-data skill after every data-altering step
+   - Check accounting integrity, fan-out, join keys, occupancy bounds
+   - "I never trust LLM data processing without an automated audit layer."
+
+5. COMMIT (Translate tech into business language)
+   - Call @business-strategist to produce PRESENTATION.md
+   - Speaker notes tone, 3 actionable recommendations, dollar impact
+
+
+================================================================================
+PART 4 — PROJECT ASSETS (WHAT TO OPEN ON SCREEN SHARE)
+================================================================================
+
+Keep these side-by-side during the screen share:
+
+FILE                                         PURPOSE
+-----------------------------------------    ---------------------------------
+.claude/ (folder tree)                       Show architecture at the start
+CLAUDE.md                                    Show the constraint spec
+1_data_prep.py + merged_data.csv             Load + join stage
+1b_data_patch.py + reconciled_data.csv       Audit/fix stage (★ showcase this)
+2_forecast_model.py + forecast_90days.csv    180-row forecast (90d × 2 hotels)
+charts/chart1_occupancy_forecast.png         Occupancy by hotel
+charts/chart2_revpar_forecast.png            RevPAR with event annotations
+charts/chart3_pickup_curve.png               Booking curve methodology
+PRESENTATION.md                              Speaker notes
+
+Screen share tips:
+  - Section 4 (Data Audit) → open 1b_data_patch.py to show the reconcile code live
+  - Section 2 (Key Findings) → switch to chart2_revpar_forecast.png when citing
+    Boston $432 RevPAR for Hans Zimmer
+
+
+================================================================================
+PART 5 — THE GOLD NUMBERS (MEMORIZE COLD — DO NOT FUMBLE)
+================================================================================
+
+HOTEL A — SANTA MONICA, CA
+  Rooms:                315
+  Avg 90-day Occupancy: 62.0%
+  Avg 90-day RevPAR:    $157.46
+  Peak date:            July 4th (Santa Monica Parade)
+    - 12,000 visitors → +3.8% event lift
+    - 96.5% forecasted occupancy
+    - $237 RevPAR
+  Pickup curve: slower — +36.6% of total room inventory over 90 days
+                (+115 rooms; steepest in 30–60 day lead time)
+
+HOTEL B — BOSTON, MA
+  Rooms:                238
+  Avg 90-day Occupancy: 88.7%
+  Avg 90-day RevPAR:    $298.91
+  Key dates:
+    - July 9–12: USENIX Annual Tech Symposium + Red Sox → 100% occ, $300–$364 RevPAR
+    - Sept 9:    Future of Passive Housing conference → 100% occ, $427 RevPAR
+    - Sept 16:   Conference cluster → 100% occ, $422 RevPAR
+    - Sept 17:   World of Hans Zimmer concert       → 100% occ, $432 RevPAR
+    - Sept 26:   Conference cluster → 100% occ, $405 RevPAR
+    - 26 total sellout dates across 90-day window
+  Pickup curve: steeper — +56.3% of total room inventory over 90 days
+                (+134 rooms; demand builds fast, rate calls must be made early)
+
+PICKUP RATE TABLE (memorize the directional gap)
+  Lead Time     Santa Monica      Boston
+  90 days       +36.6% (+115)     +56.3% (+134)
+  60 days       +33.1%            +52.3%
+  30 days       +24.5%            +39.6%
+  14 days       +15.6%            +22.0%
+  7  days        +9.0%            +11.6%
+
+EVENT WEIGHT FORMULA (know this by heart)
+  visitor_density = total_visitors / total_rooms
+  event_weight    = min(visitor_density / 1000, 0.15)
+  # capped at +15 occupancy points — physically defensible
+
+FINAL FORECAST FORMULA
+  Forecast Occupancy = OTB Occupancy + Pickup Rate + Event Weight  (cap at 1.0)
+  Forecast RevPAR    = Forecast Occupancy × Current ADR
+
+
+================================================================================
+PART 6 — DATA AUDIT FINDINGS (THE "ONE VERSION OF TRUTH" STORY)
+================================================================================
+
+This is your single strongest moment with Huan Tran. Rehearse it.
+
+STARTING POINT
+  - OTB: 4,732 rows across 26 snapshot dates × 2 hotels
+  - Events: 7,197 records spanning Jan 2024 – Sep 2025
+
+ISSUE 1 — FAN-OUT (★ headline)
+  Naïve market+date join exploded 4,732 → 28,276 rows (6× fan-out)
+  Cause: multiple events on same market+date duplicated OTB rows
+  Impact if unfixed: systematic overstating of event impact
+  Fix: pre-aggregate events to 841 event-day summaries (sum visitors,
+       count events) BEFORE joining. Result: clean 1:1 match.
+
+ISSUE 2 — OCCUPANCY OUTLIERS (32 rows)
+  hotel_b had negative left_to_sell on April 19–21
+  Cause: REAL overbooking (not a data error — standard hotel practice)
+  Fix: capped at 1.0 occupancy for model safety; flagged dates for ops review
+
+ISSUE 3 — REVENUE INTEGRITY CHECK (PASSED)
+  Max delta between reported revenue and rooms_sold × ADR = $1.36
+  Verdict: within rounding tolerance ($1.50)
+
+ISSUE 4 — JOIN KEY INTEGRITY (PASSED)
+  100% market overlap: Boston MA and Santa Monica CA matched perfectly
+  No orphaned records; cancellations filtered; no duplicate event IDs
+
+ISSUE 5 — OTB STRUCTURE CONFIRMATION
+  26 snapshots × 266 future dates = 4,732 rows (correct booking-curve shape)
+  Same future date appears up to 13 times as bookings build — this is WHY
+  we can calculate pickup rates from the data itself (no external assumptions)
+
+
+================================================================================
+PART 7 — THE THREE RECOMMENDATIONS (BUSINESS IMPACT YOU WILL PITCH)
+================================================================================
+
+RECOMMENDATION 1 — DYNAMIC RATE FENCING ON BOSTON SELLOUTS
+  Target dates: Sept 9 ($427), Sept 16 ($422), Sept 17 ($432 Hans Zimmer), Sept 26 ($405)
+  Rationale: all 4 are 100% occupancy with ADR already ~$420 — demand is proven,
+            rate ceiling has headroom
+  Current embedded ADR: avg ~$422 across these 4 dates
+  Move to: $480–$520
+  Math: ~$78 ADR lift × 238 rooms × 4 nights ≈ $74,600 incremental revenue
+  Partial capture at $460–$480: $38,000–$57,000
+  Note: July 9–12 also hit 100% occ but at lower ADR ($300–$364) — different play
+        (yield management on shoulder rates, not premium ceiling push)
+  Timeline: 24–48 hours to implement in PMS
+
+RECOMMENDATION 2 — DEMAND STIMULATION FOR SANTA MONICA SOFT WINDOW
+  Target: Aug 4 – Sep 14 (forecast occ 52–65%, thin event calendar)
+  Tactics: 3-night-min leisure discounts; direct-book corporate rates;
+           group quotes in the 52–60% range
+  Launch: 45–60 days before soft window (late June)
+  Why that timing: pickup curve is steepest in the 30–60 day window
+  Math: +8–10 occupancy points across 42 days
+        ≈ 1,000–1,300 additional room nights
+        ≈ $258,000–$335,000 incremental revenue at current ADR (~$258)
+
+RECOMMENDATION 3 — OVERBOOKING REVIEW (BOSTON APRIL 19–21)
+  Target: 32 rows with negative left_to_sell in source data
+  Ask: Is this intentional overbooking strategy (then document walk procedures
+       and displacement cost) or a system/human error (then tighten controls)?
+  Cost to investigate: zero
+  Timeline: immediate — flag to operations this week
+
+
+================================================================================
+PART 8 — EXACT SCREEN-SHARE WALKTHROUGH (10–12 MINUTES)
+================================================================================
+
+OPENING (30s)
+  "Before jumping into the numbers, I want to briefly walk through the
+   methodology, because the choice to use a transparent formula over a
+   black-box ML model was deliberate."
+
+SECTION 1 — METHODOLOGY (2 min)
+  - Open CLAUDE.md. Point to the constraint rules.
+  - Explain the 3-component model (OTB + Pickup + Event Weight).
+  - State the formula and the 15% event cap in plain English.
+  - Line: "Any number we produce can be traced directly back to source data."
+
+SECTION 2 — KEY FINDINGS (3 min)
+  - Open chart1 (occupancy forecast). Tell the "two very different hotels" story.
+  - Santa Monica: 62% / $157 — July 4th is the peak.
+  - Boston: 88.7% / $299 — July 9–12 and September drive the revenue.
+  - Open chart2 (RevPAR). Point to the event annotations.
+  - Open chart3 (pickup curves). Explain the gap: Boston builds faster.
+
+SECTION 3 — RECOMMENDATIONS (3 min)
+  - Walk through all three in order.
+  - Boston rate fencing ($75K), Santa Monica stimulation ($258–335K), overbooking review.
+  - Close each with "timeline" so they hear this is actionable.
+
+SECTION 4 — DATA AUDIT (2 min — DO NOT SKIP)
+  - Open 1b_data_patch.py.
+  - Tell the fan-out story: 4,732 → 28,276 → back to 4,732.
+  - Mention the 32 overbooking outliers, the $1.36 revenue tolerance.
+  - Line: "The pipeline handled all of this before any forecast ran."
+
+SECTION 5 — FORWARD LOOK (1 min)
+  - Modular by design. Adding a third hotel = update lookup + rerun.
+  - FastAPI-ready. Connects naturally to a live PMS feed.
+  - Known limitations (stated openly): no competitor rates, no event
+    cancellation reaction, no macro demand signals.
+
+PAUSE. Invite questions.
+
+
+================================================================================
+PART 9 — Q&A DEFENSE DRILLS (ANTICIPATED QUESTIONS + YOUR ANSWERS)
+================================================================================
+
+Q1 (Huan Tran — the AI audit question):
+"How do you know the AI didn't write buggy logic?"
+
+A: "I never assume it didn't. That's why I built the /reconcile-data skill
+into the workflow. At OMEL AI, my entire product was about catching AI
+hallucinations. I applied the same principle here. I don't read every line
+of syntax — I test the OUTPUTS against strict business boundaries:
+occupancy must be 0–100%, total rooms must balance, revenue must equal
+rooms_sold × ADR within tolerance. If the output fails the test, the
+agent rewrites it."
+
+Q2 (Matthew Klein — scale question):
+"How would you scale this across Pebblebrook's full portfolio?"
+
+A: "The code is already modular, not a monolithic script. To scale, I'd
+wrap these functions into REST endpoints using FastAPI — I have experience
+with that from Softeleven. We could containerize it with Docker, run it
+nightly via GitHub Actions, and feed Tableau directly. Adding a new hotel
+is a config change, not a rebuild."
+
+Q3: "Why not use a machine learning model?"
+
+A: "With 4,732 rows across 26 snapshots and 2 hotels, we don't have the
+training data to support a supervised ML model without overfitting. More
+importantly, stakeholders in Finance and Operations need to be able to
+ask 'why is July 11th at 100%?' and get an auditable answer. A transparent
+formula beats an overfit model in this data environment — and it's far
+more defensible with non-technical stakeholders."
+
+Q4: "How confident are you in the ADR assumption?"
+
+A: "ADR is pulled directly from current OTB. I'm not forecasting rate —
+only occupancy. Rate strategy is a decision for the revenue team. The
+model surfaces WHERE to act on rate; it doesn't dictate the rate itself."
+
+Q5: "What if an event gets cancelled?"
+
+A: "The model re-runs with updated event data. Because the pipeline is
+modular, re-forecasting a single date is straightforward. This is a known
+limitation I've called out explicitly — I'd rather flag it than hide it."
+
+Q6: "How do we validate the pickup rate assumptions?"
+
+A: "The pickup rates are derived from the OTB snapshot history in the
+source data itself — not external assumptions. As more snapshots
+accumulate, these rates can be recalibrated. They are empirical
+measurements, not guesses."
+
+Q7: "You used AI to write this code. Can you actually explain the logic?"
+
+A: "The syntax was typed by an agent, but the business logic and
+architecture were entirely mine. I specified: use an explainable model,
+weight events by visitor density relative to room count, cap the event
+lift at 15% occupancy, derive pickup rates empirically. I designed the
+pipeline; the agent wrote the pandas. That distinction is the whole
+point of the JD — architectural problem-solving, not syntax-level coding."
+
+
+================================================================================
+PART 10 — RESUME HOOKS TO DEPLOY (TIE EVERY ANSWER BACK)
+================================================================================
+
+When relevant, anchor to these resume bullets:
+
+OMEL AI (Founder)
+  - "AI Safety Layer" that intercepts enterprise chatbot hallucinations
+  - USE: any question about trusting AI output, audit, guardrails
+
+Dining Dash
+  - Zero to App Store in ONE WEEK using Claude Code + Cursor
+  - USE: any question about velocity, AI-augmented development
+
+Softeleven
+  - Infrastructure at scale: Docker, Terraform, AWS
+  - USE: questions about FastAPI integration, containerization, scaling
+
+
+================================================================================
+PART 11 — MENTAL RULES FOR THE 45 MINUTES
+================================================================================
+
+DO:
+  - Own the architecture — it's YOURS, not the AI's
+  - Use the word "orchestrate" — you orchestrate AI, you don't depend on it
+  - Keep Section 4 (Data Audit) under 3 minutes — show discipline, not detail
+  - Anchor every recommendation to a dollar figure
+  - Pause after each section to let them interject
+
+DON'T:
+  - Don't mention an AI assistant planned your workflow — that undermines JD fit
+  - Don't apologize for using AI — the JD demands it
+  - Don't drift into syntax explanations — stay at the architecture level
+  - Don't recite numbers without context — connect to business reality
+  - Don't forget the overbooking recommendation — it costs nothing and wins trust
+
+
+================================================================================
+PART 12 — THE "MIC DROP" CLOSE
+================================================================================
+
+"To summarize — I built a transparent, auditable 90-day forecast pipeline
+that combines on-the-books data, empirically-derived pickup curves, and
+event-weighted demand signals. Every number traces back to source data.
+Every stage was verified before the next one ran.
+
+This reflects how I work in general: AI as leverage, not autopilot.
+Architecture first, syntax second. And an automated audit layer on top of
+everything the model produces.
+
+I'd welcome the conversation about how this pipeline could be
+operationalized inside Pebblebrook's broader BI environment — and what
+the right next iteration looks like in partnership with your teams."
+
+
+================================================================================
+PART 13 — 15-MINUTE PRE-INTERVIEW CHECKLIST
+================================================================================
+
+[ ] Open PRESENTATION.md side-by-side with the charts folder
+[ ] Have 1b_data_patch.py ready to show the reconcile code
+[ ] Memorize the three dollar figures: $75K, $258–335K, zero-cost audit
+[ ] Memorize the four Boston sellout dates: Sept 9, Sept 16, Sept 17, Sept 26
+[ ] Memorize the two averages: 62% / $157 (SM) and 88.7% / $299 (BOS)
+[ ] Memorize the event weight formula: min(visitors / rooms / 1000, 0.15)
+[ ] Memorize the fan-out number: 4,732 → 28,276 (6× error, pre-empted)
+[ ] Rehearse the opening elevator pitch once out loud
+[ ] Rehearse the "AI audit" defense (Q1) once out loud
+[ ] Close your inbox, silence phone, test screen share before the call
+
+
+================================================================================
+END — YOU HAVE DONE THE WORK. WALK IN OWNING IT.
+================================================================================

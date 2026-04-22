@@ -1,0 +1,686 @@
+================================================================================
+PEBBLEBROOK INTERVIEW — FULL SPEAKING SCRIPT
+Associate, Enterprise Solutions & Automation
+Interviewers: Matthew Klein (Sr. Dir., Operational Excellence & Innovation)
+              Huan Tran (Manager, Enterprise AI Solutions)
+Format: 45-minute video call, screen-share walkthrough
+================================================================================
+
+SCREEN CUES are in [BRACKETS]. Pauses marked with "..." — take them.
+Target walkthrough: 15 minutes. Leave 25+ min for Q&A.
+
+================================================================================
+OPENING — 0:00 to 2:00  (AFTER INTRO PLEASANTRIES)
+================================================================================
+
+[SHARE SCREEN — open SUMMARY.md in VS Code preview, scrolled to top]
+
+"Thanks Matthew, Huan. Before I walk through the numbers, I want to take 60
+seconds to explain HOW I approached this 90-minute project — because the choice
+of methodology reflects how I work in general.
+
+On my resume you'll see I recently launched an app called Dining Dash from
+zero to the App Store in one week using Claude Code and Cursor. I also founded
+OMEL AI, where my core product was a safety layer that intercepts AI
+hallucinations in enterprise chatbots.
+
+I brought that same agentic-practitioner mindset to this forecasting project.
+The JD talks about using AI as leverage rather than autopilot — that's exactly
+how I built this. I acted as the architect. I set constraints first. I
+delegated syntax to agents. And I ran every output through an audit gate
+before anything downstream ran. Let me show you."
+
+[SCROLL TO §1 — "How I Framed the Problem"]
+
+"Three constraints drove every decision on this project.
+
+One — stakeholders in Finance and Operations have to understand the *why* of
+every number. That ruled out black-box ML right away.
+
+Two — 4,732 rows across two hotels and 26 snapshots isn't enough data to
+train a supervised model without overfitting. So the smart move is to measure
+things empirically from the source data itself, not import external assumptions.
+
+Three — this has to scale across a REIT portfolio. That means modular
+functions, FastAPI-ready architecture, not one-off scripts.
+
+With those locked in, the core question became: given what's on the books
+today, how much more will book by each future date, and what do events add
+on top? That framing produced a three-component model I'll walk through in
+a moment."
+
+================================================================================
+SECTION 1 — AI-AUGMENTED WORKFLOW  (2:00 to 4:00)
+================================================================================
+
+[SCROLL TO §2 — "My AI-Augmented Workflow"]
+
+"This is where I want to spend a moment, because one of the cover letter
+questions was about how I use AI in my workflow and — more importantly — how I
+audit the output.
+
+[POINT TO THE STACK LIST]
+
+For this project I used Claude Code with a custom project workspace at
+dot-claude. Inside that workspace I set up two purpose-built agents and one
+custom skill. The pipeline-architect agent handles data engineering and
+forecasting. The business-strategist agent handles the translation layer —
+turning numbers into stakeholder language. And the custom skill called
+reconcile-data is the audit gate I run before any forecasting code executes.
+
+There's a file called CLAUDE.md at the project root. It contains the business
+constraints I mentioned — no black-box models, modular code, explainable
+logic. Every agent session loads that file automatically. So the AI is
+operating inside guardrails I set, not the other way around.
+
+[POINT TO THE 5-STEP LOOP CODE BLOCK]
+
+My loop for every stage is the same five steps. Spec — write constraints
+before any code exists. Decompose — break the problem into independent,
+testable units. Generate — delegate boilerplate to the agent. Verify — run
+the audit skill. Only if it passes do I commit and move to the next stage.
+
+[POINT TO THE AUDIT BULLETS]
+
+Here's the part I think is the real differentiator. I don't audit AI output by
+reading syntax line by line — that doesn't scale. I audit at the data
+boundary. Occupancy has to be between 0 and 1. Rooms sold plus left-to-sell
+plus out-of-order has to equal total rooms. Revenue has to equal rooms times
+ADR within rounding tolerance. Event joins can't fan-out. If any of those
+tests fail, the agent rewrites. If the agent can't explain WHY a number is
+what it is, the number doesn't ship.
+
+That's the same principle I built my product on at OMEL AI."
+
+[PAUSE — let them absorb. Don't fill silence.]
+
+================================================================================
+SECTION 2 — THE MODEL (4:00 to 5:30)
+================================================================================
+
+[SCROLL TO §3 — "Three Explainable Components"]
+
+"Three components. Every number traces to one of these.
+
+[POINT TO FORMULA BLOCK]
+
+Forecast Occupancy equals on-the-books occupancy, plus an empirically-derived
+pickup rate, plus an event weight — capped at 100%. Forecast RevPAR is
+forecast occupancy times current ADR.
+
+OTB occupancy is ground truth. Not a prediction. Already booked.
+
+Pickup rate is the forecast's real work — how much more will book between now
+and arrival. I derived this empirically from the 26 snapshots in the source
+data. I'll show you that code in a minute.
+
+Event weight is the lift events add on top. I normalize by room count — a
+50,000-person conference means something very different to a 238-room hotel
+versus a 3,000-room hotel. I capped it at 15 occupancy points so no single
+event can produce an implausible forecast.
+
+Why not ML? Two reasons. Data volume — 4,732 rows, 2 hotels, 26 snapshots.
+Not enough. And stakeholders have to be able to ask 'why is July 11 at 100%?'
+and get a traceable answer. A transparent formula wins every time in this
+data environment."
+
+================================================================================
+SECTION 3 — DATA AUDIT: "ONE VERSION OF THE TRUTH"  (5:30 to 9:00)
+★ HUAN TRAN'S MOMENT — DO NOT RUSH THIS ★
+================================================================================
+
+[SWITCH TO: 1b_data_patch.py — scroll to aggregate_events function]
+
+"Another cover letter question asked about reconciling two datasets into one
+version of the truth. This is exactly what happened here.
+
+I started by naively joining OTB with events on market and date. Row count
+exploded from 4,732 to 28,276. A 6x fan-out. The cause — multiple events can
+hit the same market on the same date, and a naive join duplicates OTB rows
+for each event.
+
+If I'd let that through, I would have systematically overstated the event
+impact on revenue. The forecast would have been confidently wrong.
+
+[POINT TO aggregate_events FUNCTION]
+
+The fix is this function. Before joining, I aggregate events down to one row
+per market-date — summing visitors, counting events, keeping the top category.
+That collapses 7,197 event records to 841 day-summaries. Then the join is
+clean, one-to-one, row count preserved.
+
+[SCROLL DOWN TO fix_occupancy_outliers]
+
+The second finding was this. 32 rows in hotel_b had occupancy above 100%. My
+first instinct was data error, but when I looked at the pattern — it was all
+clustered on April 19, 20, and 21. That's Boston Marathon weekend. What I was
+actually seeing was real overbooking in the source data. Negative left-to-sell
+values. A physical impossibility in inventory, but a real-world condition in
+hotel operations.
+
+For model safety, I capped those at 1.0 occupancy. But I flagged the dates as
+Recommendation 3 — because the operational signal is more valuable than the
+data-hygiene fix. Ops needs to see this.
+
+[SCROLL TO validate_final or similar]
+
+And for the revenue check — I verified rooms_sold times adr_sold equals
+revenue_sold across the whole dataset. Max delta was $1.36. Within $1.50
+tolerance. Rounding, not a defect.
+
+Those three checks ran as the /reconcile-data skill before any forecast code
+executed. That's what I mean when I say the audit is the work, not an
+afterthought."
+
+[SWITCH BACK TO: SUMMARY.md §4 briefly, scan the audit table]
+
+================================================================================
+SECTION 4 — PICKUP DERIVATION  (9:00 to 11:00)
+================================================================================
+
+[SWITCH TO: 2_forecast_model.py — scroll to compute_pickup_rates]
+
+"Here's the core logic moment. For every future business date, the source
+data has multiple snapshots showing how bookings built toward check-in. 26
+snapshots for each date at different lead times.
+
+[POINT TO THE INNER LOOP]
+
+What I'm doing here — for every business date, find rooms_sold at lead time
+zero, which is check-in. Then for each lead-time bucket — 7, 14, 30, 60, 90
+days out — find the closest snapshot. The pickup at that bucket is rooms at
+check-in minus rooms at that bucket, divided by total rooms.
+
+Average that across every business date, and you get a hotel-specific pickup
+curve. Empirical. Not an external assumption.
+
+[SWITCH TO: chart3_pickup_curve.png — full screen]
+
+And when you plot the two hotels, two distinct personalities emerge.
+
+Boston — steep curve. 56.3% pickup over 90 days. That's 134 incremental rooms.
+Demand builds fast. Rate decisions on high-demand dates have to be made early.
+
+Santa Monica — shallow curve. 36.6% over 90 days. 115 rooms. More gradual.
+More room for demand stimulation on soft dates.
+
+The shape of these curves is what drives the recommendations."
+
+================================================================================
+SECTION 5 — RESULTS  (11:00 to 13:00)
+================================================================================
+
+[SWITCH TO: chart1_occupancy_forecast.png — full screen]
+
+"Top line. Santa Monica averages 62% forecast occupancy across the 90-day
+window. Boston averages 88.7%. These are very different hotels in very
+different markets.
+
+[SWITCH TO: chart2_revpar_forecast.png]
+
+On RevPAR — Santa Monica 157 dollars, Boston 299 dollars. Nearly double on
+a per-available-room basis.
+
+The July 4 spike on Santa Monica is the Santa Monica Fourth of July Parade —
+12,000 visitors, hotel hits 96.5% occupancy and $237 RevPAR. The peak of the
+SM window.
+
+Boston shows multiple spikes. Let me call out three.
+
+September 17 — the World of Hans Zimmer concert. $432 RevPAR. Highest single
+day of the forecast.
+
+September 9 — Future of Passive Housing conference. $427.
+
+July 9 through 12 — USENIX Technical Symposium overlaps with a Red Sox
+homestand. Four consecutive nights of 100% occupancy.
+
+[SWITCH TO: forecast_90days.csv in Numbers/Excel — sorted descending by forecast_revpar]
+
+And if you want to see every number behind those spikes — this is the full
+180-row output. 90 days × 2 hotels. Every forecast occupancy and RevPAR value
+is here, along with the event count, visitor volume, and event names that
+drove each one.
+
+Every spike in the charts ties to a row in this file. End-to-end auditable."
+
+================================================================================
+SECTION 6 — RECOMMENDATIONS  (13:00 to 14:30)
+================================================================================
+
+[SWITCH BACK TO: SUMMARY.md §7]
+
+"Three recommendations. Each with a dollar figure and a timeline.
+
+One — dynamic rate fencing on Boston sellouts. Four specific dates: September
+9, 16, 17, and 26. All forecasted at 100% occupancy with ADR already around
+$422. Demand ceiling is confirmed. Lift ADR to $480 to $520. That's roughly
+$75,000 in incremental revenue on rate alone, no change in occupancy. This
+can be implemented in the PMS within 24 to 48 hours.
+
+Two — demand stimulation for Santa Monica's soft window. August 4 through
+September 14 is 42 days running at 58% occupancy with a thin event calendar.
+Recovering 8 to 10 occupancy points — which is 1,000 to 1,300 room nights at
+$258 ADR — is $258,000 to $335,000 in incremental revenue. Launch 45 to 60
+days ahead because that's where the pickup curve is steepest.
+
+Three — overbooking review. 32 rows in the source data with negative
+left-to-sell. Is this intentional yield strategy? Is it a system defect? Zero
+cost to investigate. High-trust recommendation because it's operational, not
+analytical. Flag it to Ops this week."
+
+================================================================================
+SECTION 7 — LIMITATIONS + CLOSE  (14:30 to 16:00)
+================================================================================
+
+[SCROLL TO §8 — Limitations]
+
+"Before I stop, I want to be direct about what this model is NOT.
+
+It's not a rate forecast. ADR is held at OTB baseline. The model tells you
+WHERE to act on rate. The rate itself is a decision for the revenue team.
+
+It's not competitor-aware. No comp-set data in scope.
+
+It's not reactive to event cancellation. A cancellation requires a rerun.
+The pipeline is modular, so reforecasting a single date is trivial.
+
+And it's built on 26 static snapshots. Production would replace that with
+a live OTB feed.
+
+Next iteration would add competitor rate data, macro demand signals — flight
+searches, weather — a day-of-week seasonality layer, and a continuous OTB
+pipeline. The output naturally plugs into Tableau for proactive reporting,
+which is one of the things the JD specifically mentions.
+
+[SCROLL TO §9 — Architecture]
+
+Everything is modular. Adding a third hotel is a config change, not a
+rebuild. Every function slots behind a FastAPI endpoint with no refactor.
+
+[THIS IS THE CLOSE — slow down, eye contact with camera]
+
+The same architecture works for the Property Data Portal — inputs, audit
+gate, transform, output, with AI agents handling the transform logic under
+a verification boundary. That's the workflow I'd bring on day one.
+
+I'd welcome the conversation about how this pipeline could be operationalized
+inside Pebblebrook's broader BI environment — and what the right next
+iteration looks like in partnership with your teams."
+
+[PAUSE. Stop sharing if appropriate, or leave SUMMARY.md up. Let them speak first.]
+
+
+================================================================================
+================================================================================
+Q&A — ANTICIPATED QUESTIONS + YOUR ANSWERS
+================================================================================
+================================================================================
+
+PRINCIPLE: Anchor every answer to (a) this project, (b) a resume hook, or
+(c) the JD language. Keep answers under 90 seconds.
+
+--------------------------------------------------------------------------------
+Q1 (HIGH PROBABILITY — HUAN TRAN):
+"Walk us through your AI-augmented workflow. How do you audit the output?"
+--------------------------------------------------------------------------------
+
+"The workflow is what I just showed you. I use Claude Code with a custom
+project workspace. I write the constraints into a CLAUDE.md file before any
+code exists — that's the spec step. I decompose the problem into independent
+stages. I delegate syntax to agents — pandas joins, chart scaffolding,
+boilerplate. But I never delegate the architecture.
+
+The audit layer is where I spend the most time. I don't read every line of
+AI-generated code. I test the outputs against strict business boundaries.
+For this project, that meant occupancy between 0 and 1, inventory equations
+balancing, revenue matching rooms-times-ADR within tolerance, and join
+integrity — no fan-out. That all lives in my /reconcile-data skill which
+runs as a gate.
+
+At OMEL AI, my whole product was an AI safety layer for enterprise chatbots.
+Same principle applied here — trust-but-verify at the data boundary. If the
+agent can't explain a number, the number doesn't ship."
+
+--------------------------------------------------------------------------------
+Q2 (HIGH PROBABILITY):
+"How did you ensure 'one version of the truth' when reconciling the datasets?"
+--------------------------------------------------------------------------------
+
+"Three specific things. First, I built a reconciliation gate as a reusable
+skill — not a one-off check. Any time I merge two datasets, that skill runs.
+
+Second, I identified the primary key correctly. For OTB it's not just
+hotel-plus-business-date — the booking curve structure means you have
+multiple snapshots for the same future date. The true PK is hotel-plus-
+snapshot-plus-business-date. Getting that wrong would have caused
+deduplication errors downstream.
+
+Third, I caught the event fan-out before the join ran. A 6x explosion from
+4,732 to 28,276 rows. Pre-aggregating events to one row per market-date was
+the fix. Row count preserved end-to-end.
+
+The skill framework is reusable — it's the same pattern I'd apply to any
+two datasets I need to reconcile at Pebblebrook."
+
+--------------------------------------------------------------------------------
+Q3 (MATTHEW KLEIN LIKELY):
+"How would you scale this across Pebblebrook's portfolio?"
+--------------------------------------------------------------------------------
+
+"The code is already modular, not a monolithic script. To scale I'd wrap the
+functions into REST endpoints with FastAPI — I have experience with that from
+Softeleven. Containerize with Docker, schedule nightly via GitHub Actions
+or similar, feed Tableau directly for proactive reporting.
+
+Adding a new hotel is a configuration change — the total_rooms lookup and
+the market-to-hotel mapping. Not a rebuild.
+
+The harder scaling question is the one I'd want to talk through with your
+team — what's the ingestion pattern for live OTB data across the portfolio?
+Are we pulling from a central warehouse, or from property-level PMS
+integrations? That determines whether I build an ETL layer or a polling
+pattern."
+
+--------------------------------------------------------------------------------
+Q4:
+"Why did you choose this approach over a machine learning model?"
+--------------------------------------------------------------------------------
+
+"Two reasons. First, data volume. 4,732 rows across 2 hotels and 26
+snapshots is not enough to train a supervised model without serious
+overfitting. I'd be learning noise, not signal.
+
+Second, explainability. Stakeholders in Finance and Operations have to be
+able to ask 'why is July 11 forecasted at 100%?' and get a traceable answer.
+A transparent formula with empirical pickup and named event drivers gives
+them that. An ML model — even a good one — would force me to hand back
+SHAP values, which is not how Finance wants to consume a forecast.
+
+At larger data volume — say 50 hotels, three years of history — I'd
+revisit. But even then, I'd layer ML on top of this transparent baseline,
+not replace it. Baseline first, then a learned residual."
+
+--------------------------------------------------------------------------------
+Q5:
+"How confident are you in the ADR assumption?"
+--------------------------------------------------------------------------------
+
+"ADR is pulled directly from current OTB — it's not something I'm forecasting.
+I'm forecasting occupancy; rate is held constant at the on-the-books
+baseline.
+
+That's a deliberate scoping choice. Rate strategy is a decision for the
+revenue team, not the model. What the model can do is surface where rate
+decisions would have the most leverage — that's what Recommendation 1 does
+for the Boston sellout dates. It says 'demand will absorb a rate increase
+here,' but it doesn't prescribe the number."
+
+--------------------------------------------------------------------------------
+Q6:
+"What happens if an event gets cancelled?"
+--------------------------------------------------------------------------------
+
+"The pipeline reruns with updated event data. Because everything is modular,
+reforecasting a single date is trivial — it's not a whole-system rebuild.
+
+I've called this out explicitly as a limitation in the deck. The current
+version is static — it doesn't watch for event cancellations or react in
+real time. In production I'd add a lightweight job that pulls event data
+daily and triggers a rerun if anything changes.
+
+The reason I didn't build that in the 90-minute budget is prioritization —
+the audit layer and the pickup logic had higher ROI for the initial
+deliverable."
+
+--------------------------------------------------------------------------------
+Q7:
+"How do you validate the pickup rate assumptions?"
+--------------------------------------------------------------------------------
+
+"They're not assumptions — they're empirical measurements from the source
+data itself. The 26 OTB snapshots give me, for every future business date,
+a time series of how bookings built toward check-in. I measure what actually
+happened in the historical window and average across dates to build the
+curve.
+
+That's a better answer than importing an industry-average pickup curve or
+making up a number. And as more snapshots accumulate over time, the curve
+self-recalibrates. It's observational, not prescriptive."
+
+--------------------------------------------------------------------------------
+Q8 (COVER LETTER Q4 — STAKEHOLDER COMMUNICATION):
+"Tell me about explaining a technical limitation to a non-technical stakeholder."
+--------------------------------------------------------------------------------
+
+"Best example is from OMEL AI. We were pitching an enterprise chatbot to a
+client, and the client wanted the bot to guarantee zero hallucinations. I
+had to explain that large language models generate probabilistically —
+there's no deterministic guarantee, even with RAG. Saying 'zero' would be
+dishonest.
+
+So I reframed the conversation around the business outcome, not the
+technical mechanism. I said — here's what we can give you. We can intercept
+any output that contradicts your knowledge base. We can block any output
+that references a policy outside their defined scope. We can log every
+intercept so your compliance team has an audit trail. What we can't do is
+guarantee a probabilistic model never produces a wrong token.
+
+They accepted that framing because it gave them the risk posture they
+actually needed — defensibility in front of THEIR auditors — without
+requiring me to lie about what the technology does."
+
+--------------------------------------------------------------------------------
+Q9 (COVER LETTER Q1 — AUTOMATION NOBODY ASKED FOR):
+"Tell me about a broken process you automated that nobody asked you to fix."
+--------------------------------------------------------------------------------
+
+"[Use your strongest real example here — Dining Dash workflow, OMEL AI
+pipeline, or a Softeleven automation. Keep it under 90 seconds. Structure:
+the friction, what you built, the specific outcome in hours or dollars
+saved. End with WHY you saw it as a problem when nobody flagged it.]"
+
+--------------------------------------------------------------------------------
+Q10 (COVER LETTER Q5 — LEARNING NEW TECH IN 48 HOURS):
+"How do you get proficient with a new framework in 48 hours?"
+--------------------------------------------------------------------------------
+
+"Three things, in this order.
+
+One — read the official docs end to end, even the parts I don't think I
+need. The fastest way to misuse a new framework is to start from Stack
+Overflow. The official docs give me the mental model the authors intended.
+
+Two — build the smallest possible working thing. Not a tutorial copy. A
+real use case I actually need, stripped to its most minimal form. That's
+where I find the gotchas — auth flows, rate limits, edge cases.
+
+Three — read the source code for the one or two internals I most depend on.
+With an MCP gateway, I'd read the protocol spec plus one reference server
+implementation. Then I have a real mental model, not just a surface-level
+one.
+
+That's how I learned Claude Code skills and agent SDK — docs, minimal
+project, source. 48 hours from zero to productive."
+
+--------------------------------------------------------------------------------
+Q11:
+"What would you do differently if you had more time?"
+--------------------------------------------------------------------------------
+
+"Four things, in priority order.
+
+One — bring in competitor rate data. Rate compression versus comp-set is
+probably the single highest-ROI data layer missing.
+
+Two — add macro demand signals. Flight search volumes, weather forecasts,
+Google Trends for major event names. These arrive earlier than the OTB
+signal and would let me forecast further out confidently.
+
+Three — a day-of-week seasonality layer. Right now the pickup curve is
+averaged across all dates. Tuesday and Saturday don't book the same way.
+
+Four — migrate from 26 static snapshots to a continuous OTB feed. That's
+the productionization step — and it's where the FastAPI architecture I
+built pays off."
+
+--------------------------------------------------------------------------------
+Q12:
+"What's the weakest part of this model?"
+--------------------------------------------------------------------------------
+
+"Two things honestly.
+
+First — the event weight cap at 15% is intentionally conservative, but
+it's also somewhat arbitrary. I chose it to prevent a single event from
+flipping a forecast implausibly, but I haven't calibrated it against actual
+historical event lift versus non-event dates. With more data, I'd replace
+the cap with a learned coefficient on visitor density.
+
+Second — the pickup curve uses only 26 snapshots. That's thin. The pattern
+is consistent enough across business dates that I trust the shape, but
+the magnitude could be off by a few percentage points on any given bucket.
+More snapshots over time is the mitigation.
+
+Those are the two honest answers. Everything else is within acceptable
+bounds for a 90-minute build."
+
+--------------------------------------------------------------------------------
+Q13:
+"How would this integrate with Tableau?"
+--------------------------------------------------------------------------------
+
+"The forecast CSV is already the integration point. Tableau reads CSV
+natively, but the cleaner path is to front the pipeline with a FastAPI
+endpoint that returns the forecast as JSON or direct SQL against a Postgres
+table that the pipeline writes to.
+
+For proactive reporting — which the JD specifically mentions — I'd build a
+dashboard with three views. Portfolio heatmap by hotel and date. Event-
+driven revenue attribution. Pickup-versus-forecast tracking so you can see
+if actual pickup is coming in above or below the model's expectation. That
+last one becomes the early-warning signal for revenue leaders.
+
+That's the dashboard I'd want to ship in the first 90 days."
+
+--------------------------------------------------------------------------------
+Q14:
+"You said you used AI for the code. Can you actually explain the logic?"
+--------------------------------------------------------------------------------
+
+"Yes — and I'll demonstrate right now. [Open 2_forecast_model.py.]
+Pick any function and I'll walk through it.
+
+More broadly — the syntax was written by an agent, but the architecture,
+the business logic, and the constraints were entirely mine. I specified
+the three-component model. I specified the empirical pickup derivation.
+I specified the 15% event cap. I specified the audit gate. The agent
+translated those specifications into pandas.
+
+That distinction is the whole point of the JD — architectural problem-
+solving, not syntax-level coding. I own the architecture. I don't
+apologize for delegating the syntax."
+
+--------------------------------------------------------------------------------
+Q15:
+"Why do you want this role specifically?"
+--------------------------------------------------------------------------------
+
+"Two reasons.
+
+First — the work is concrete. The JD talks about the Property Data Portal,
+cross-functional integrations with Finance and Accounting, and data pipelines
+that drive actual management decisions. That's the kind of work where I can
+see the impact of what I build, quickly, because it lands with a real user.
+
+Second — the agentic practitioner framing in the JD is rare. Most companies
+either ban AI tools or use them without discipline. Pebblebrook is
+explicitly hiring for the thing I already practice — AI as leverage, with
+an audit layer on top. That's a hard fit to find, and it's why I put real
+effort into this 90-minute exercise."
+
+--------------------------------------------------------------------------------
+Q16:
+"Any questions for us?"
+--------------------------------------------------------------------------------
+
+"Three.
+
+One — what does the first 90 days look like in this role? Is there a
+specific automation or tool the team would want me to take on first?
+
+Two — how does the Enterprise AI Solutions team currently handle the
+audit-layer question? Is there an existing pattern for validating AI output
+across the portfolio, or is that something the next hire would help build?
+
+Three — what's the most common reason someone doesn't succeed in this role
+within the first 12 months?"
+
+[That third question is the one that separates serious candidates. Ask it.]
+
+
+================================================================================
+RAPID-FIRE: ONE-LINE ANSWERS FOR UNEXPECTED QUESTIONS
+================================================================================
+
+Q: "What's RevPAR?"
+A: "Revenue per available room — revenue divided by total rooms. It's the
+primary efficiency metric in hospitality because it combines rate and
+occupancy into one number."
+
+Q: "What's a REIT?"
+A: "Real Estate Investment Trust. Publicly-traded, must distribute 90%+ of
+taxable income to shareholders, operates hotels in Pebblebrook's case. The
+structure means data accuracy has SEC reporting implications, not just
+operational ones."
+
+Q: "Favorite part of building this?"
+A: "Finding the fan-out. 4,732 rows exploding to 28,276 on a naive join is
+the kind of mistake that would have been invisible in the final forecast —
+the numbers would have looked plausible. That's exactly the class of error
+the audit layer exists to catch."
+
+Q: "Hardest part?"
+A: "Deciding what to cut. 90 minutes forced tradeoffs. The competitor-rate
+layer and the day-of-week seasonality layer both got deferred. Those were
+the hardest skips."
+
+Q: "What tools do you use day to day?"
+A: "Claude Code for agentic work. Cursor for IDE-level AI-assisted editing.
+Python, pandas, FastAPI on the backend. Postgres. For visualization — Plotly
+or Matplotlib for quick, Tableau when the audience is business-side."
+
+Q: "Biggest lesson from OMEL AI?"
+A: "Guardrails are the product. The LLM is the easy part. The hard part —
+the part that earns enterprise trust — is the verification layer around it.
+That lesson is why I built the reconcile-data skill before I built the
+forecast."
+
+Q: "Biggest lesson from Dining Dash?"
+A: "Velocity compounds when you let agents handle boilerplate. Week-one to
+App Store only works if you stop writing authentication code yourself and
+start orchestrating agents that have already seen 10,000 auth flows."
+
+
+================================================================================
+RULES FOR YOURSELF
+================================================================================
+
+DO:
+- Own the architecture — it's yours, not the AI's
+- Pause after each section to let them interject
+- Anchor every answer to this project, a resume hook, or the JD language
+- Use RevPAR, occupancy, OTB, pickup — the vocabulary of the role
+- Name limitations openly — senior signal
+
+DON'T:
+- Don't apologize for using AI — the JD demands it
+- Don't say "the AI assistant planned my workflow" — you planned it, AI wrote syntax
+- Don't skip the overbooking recommendation — it's your zero-cost trust win
+- Don't fumble numbers — if unsure, say "let me pull it up" and open the CSV
+- Don't end on limitations — end on the architecture close and your question back
+
+
+================================================================================
+END OF SCRIPT
+================================================================================

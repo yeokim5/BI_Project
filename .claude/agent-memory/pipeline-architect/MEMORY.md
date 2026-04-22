@@ -1,0 +1,1 @@
+- [Pebblebrook Forecast Pipeline — Architecture & Key Facts](project_forecast_pipeline.md) — Core pipeline design, data facts, modeling decisions for 90-day OTB + event forecast

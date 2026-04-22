@@ -1,0 +1,3 @@
+- [Pebblebrook BI Forecast Project](project_pebblebrook_forecast.md) — two-hotel 90-day forecast PoC, interview context, key model parameters and data audit findings
+- [RevPAR Sensitivity Patterns](revpar_sensitivity_patterns.md) — pickup curve asymmetry, event weight cap behavior, soft window identification, Finance communication notes
+- [Presentation Approach](presentation_approach.md) — validated structure and tone for hotel BI presentations to non-technical executive audiences
