@@ -12,7 +12,7 @@
 |---|---|
 | Stakeholders in Finance / Ops must understand the "why" | **No black-box ML.** Every number must trace to source. |
 | 90-min build, 4,732 rows, 2 hotels | Not enough data for supervised ML without overfit. Empirical baselines win. |
-| Must scale across a REIT portfolio | Modular functions, not one-off scripts. **FastAPI-ready.** |
+| Must scale across a REIT(Real Estate Investment Trusts) portfolio | Modular functions, not one-off scripts. **FastAPI-ready.** |
 
 **Core question:** *Given what's on the books today, how much more will book by each future date, and what do events add on top?*
 
@@ -53,8 +53,8 @@ COMMIT      →  Only proceed to next stage after audit passes
 - Got: `2_forecast_model.py`, `forecast_90days.csv` — 180-row forecast, 3 charts (Occupancy, RevPAR, Pickup), clear pickup + event weighting logic
 
 🔴 **Step 4: Presentation** — agent: `@business-strategist`
-- Asked: Translate results into interview-ready presentation with methodology, insights, recommendations
-- Got: `PRESENTATION.md` — full narrative + business insights + strategy, ready for screen-share interview
+- Asked: Translate results into presentation with methodology, insights, recommendations
+- Got: `PRESENTATION.md` — full narrative + business insights + strategy
 
 **How I audit AI output (directly answering the JD's cover letter question):**
 
@@ -84,6 +84,18 @@ Event Weight        =  min( visitors / rooms / 1000 ,  0.15 )   # 15% ceiling
 | **Pickup Rate** | Expected additional bookings by arrival | **Derived empirically** from 26 OTB snapshots — not an external assumption |
 | **Event Weight** | Incremental occ lift from market events | Normalized by room count; capped at +15 pts so a single event can't flip a forecast |
 
+**In Plain Terms:**
+
+Imagine a hotel has 100 rooms. Tonight, 50 are already confirmed. The question is: how many will check in by end of day?
+
+```
+Final Occupancy = Already Booked + More That Will Book Before Arrival + Event Boost
+```
+
+- **OTB Occupancy** — this is the "already booked" part. Not a guess. A fact from the system.
+- **Pickup Rate** — guests don't all book on day 1. Some book 3 months out, some book the night before. Pickup measures that gap between early bookings and final count.
+- **Event Weight** — a Hans Zimmer concert nearby pulls more guests to the market. Bigger event = bigger lift, but capped at +15% so one concert can't flip the entire forecast.
+
 ---
 
 ## 4. Data Audit — "One Version of the Truth" Before Forecasting
@@ -98,7 +110,17 @@ I treat reconciliation as a gate, not an afterthought. The `/reconcile-data` ski
 | Join keys (markets) | 100% overlap, zero orphaned records | Passed |
 | Forecast formula | Manual verification on all 180 output rows | Zero residual — formula exactly matches CSV |
 
-The audit **is** the work. A forecast built on unreconciled data is a confident lie.
+**In Plain Terms:**
+
+Before calculating anything, verify the data isn't broken. Three specific problems were caught and fixed:
+
+1. **Fan-out (the big one):** Events table had 4,732 rows. OTB had 180 rows. A naive join produced 28,276 rows — data multiplied itself 6×. Fix: collapse events to one row per (market, date) first, then join. 4,732 → 841 summary rows → clean join.
+
+2. **Impossible occupancy:** 32 rows showed occupancy over 100% (Boston, April 19–21). More rooms sold than exist. Either intentional overbooking strategy or a system bug. Capped at 100% for forecast; flagged for Ops to investigate.
+
+3. **Revenue math check:** `ADR × rooms_sold` should equal `revenue_sold`. Largest gap found: $1.36. That's rounding, not a data error. Accepted.
+
+A forecast built on unreconciled data is a confident lie. The audit runs first, always.
 
 ---
 
@@ -117,11 +139,27 @@ for each business_date:
 
 ![Pickup Curve](charts/chart3_pickup_curve.png)
 
-**Two distinct market personalities emerge:**
-- **Boston** — steep curve, **+56.3%** pickup over 90 days → demand builds fast, rate calls must be made early
-- **Santa Monica** — shallow curve, **+36.6%** pickup over 90 days → more room for demand stimulation
+**In Plain Terms:**
 
-The curve shape drives the recommendations in §7.
+Hotels don't fill up on day 1. Guests trickle in over weeks. The data had 26 snapshots of the same hotel across time — like taking a photo of the booking count every week and watching it climb toward check-in.
+
+Concrete example for a single date:
+```
+90 days before arrival → 32 rooms sold
+60 days before arrival → 41 rooms sold
+30 days before arrival → 55 rooms sold
+Day of arrival         → 71 rooms sold (final count)
+
+Pickup from 90-day-out = (71 - 32) / 100 total rooms = +39% will still book
+```
+
+Do this calculation for every historical date, average across all dates → hotel's unique pickup curve. No industry benchmarks borrowed. No assumptions imported. Numbers come from this hotel's own behavior.
+
+**Two distinct market personalities emerge:**
+- **Boston** — steep curve, **+56.3%** pickup over 90 days → guests book late and fast → revenue calls must be made early or you miss the window
+- **Santa Monica** — shallow curve, **+36.6%** pickup over 90 days → guests spread bookings out → more time to run promotions and stimulate demand
+
+The curve shape directly drives the recommendations in §7.
 
 ---
 
@@ -138,7 +176,13 @@ The curve shape drives the recommendations in §7.
 | Sellout Dates | 0 | 26 of 90 |
 | Peak Date | Jul 4 → $237 RevPAR | Sep 17 (Hans Zimmer) → $432 RevPAR |
 
-Every spike ties to a named event in the source data — every number traces back to a row.
+**In Plain Terms:**
+
+**Santa Monica (Hotel A):** Averages 62% occupancy — not full, real room to grow revenue. July 4th is the standout at $237 RevPAR, driven by holiday demand. Zero sellout dates over 90 days means opportunity to pull more guests in.
+
+**Boston (Hotel B):** Near-full most days at 88.7%. Already sells out 26 of 90 nights. The Hans Zimmer concert on Sep 17 spikes RevPAR to $432 — that's the highest single day in the entire forecast. The hotel is leaving money on the table by not raising rates on those sellout nights.
+
+Every spike in the charts ties to a named event in `data-events.csv`. Every number traces back to a specific row. No black box.
 
 ---
 
@@ -147,11 +191,17 @@ Every spike ties to a named event in the source data — every number traces bac
 ### Rec 1 — Boston Rate Fencing · ~$75K incremental
 Four sellout dates where ADR already sits at $422 (Sep 9, 16, 17, 26). Forecast confirms the demand ceiling; lift ADR to **$480–$520**. Timeline: 24–48 hours in the PMS.
 
+**Why this works:** Hotel is already sold out on those nights — demand exceeds supply. At full occupancy, only way to grow revenue is to charge more per room. Raising rate from $422 to $500 on 4 dates × ~180 rooms = ~$75K incremental revenue. Change takes 24–48 hours in the property management system.
+
 ### Rec 2 — Santa Monica Soft-Window Stimulation · ~$258K–$335K incremental
 Aug 4 – Sep 14 runs at **58% occupancy** with a thin event calendar. Pickup curve is steepest 45–60 days out — that's the launch window for leisure and group offers.
 
+**Why this works:** Santa Monica's pickup curve shows guests make decisions 45–60 days before arrival. That window is open right now for August dates. Targeted leisure promotions or group rate offers launched today will hit guests at exactly the moment they're deciding — not too early (they ignore it), not too late (they booked elsewhere).
+
 ### Rec 3 — Overbooking Review · Zero cost
 32 source-data rows show negative `left_to_sell` on Boston Apr 19–21. Intentional yield strategy, or a system/process defect? Flag to Ops this week. Either answer improves data integrity.
+
+**Why this matters:** If intentional — good, confirm the policy is documented. If accidental — a data or process bug is inflating occupancy numbers and corrupting every downstream report that reads from this system. Either way, the answer costs nothing to find and is worth knowing.
 
 ---
 
@@ -159,12 +209,16 @@ Aug 4 – Sep 14 runs at **58% occupancy** with a thin event calendar. Pickup cu
 
 Honest about what this model is **not**, so the next iteration is obvious:
 
-- **Not** a rate forecast. ADR is held at OTB baseline. Model surfaces *where* to act on rate, not the rate itself.
-- **Not** competitor-aware. No comp-set rates in scope.
-- **Not** reactive to event cancellations. Requires a rerun. Pipeline is modular — single-date reforecast is trivial.
-- **Not** continuous. Built on 26 static snapshots; production would replace with a live OTB feed.
+| Gap | What it means in practice |
+|---|---|
+| **Not a rate forecast** | ADR is held flat at today's OTB baseline. Model shows *where* to act on rate, not what rate to set. Needs a separate rate optimization layer. |
+| **Not competitor-aware** | If the Marriott next door drops rate 20%, this model doesn't react. A comp-set feed would close this gap. |
+| **Not reactive to cancellations** | If Hans Zimmer cancels, forecast must be rerun manually. Pipeline is modular — single-date reforecast is trivial, but it's not automatic. |
+| **Not continuous** | Built on 26 static snapshots. Production version would replace with live OTB feed updating daily. |
 
-**Next iteration:** competitor rate feed, macro demand signals (flight search, weather), day-of-week seasonality layer, continuous OTB ingest. Natural Tableau dashboard once the pipeline is API-fronted.
+**What "not a rate forecast" means practically:** The model says "Boston Sep 17 will be 100% occupied." It doesn't say "charge $520 vs $422." That *where-to-act* signal is what drives Rec 1 — but the optimal rate number itself requires a separate model with comp-set data and price elasticity curves.
+
+**Next iteration:** competitor rate feed, macro demand signals (flight search, weather), day-of-week seasonality layer, continuous OTB ingest, Tableau dashboard once pipeline is API-fronted.
 
 ---
 
