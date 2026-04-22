@@ -38,6 +38,24 @@ VERIFY      →  Run /reconcile-data skill — catch hallucinations at the data 
 COMMIT      →  Only proceed to next stage after audit passes
 ```
 
+**What each stage looked like in practice:**
+
+🟢 **Step 1: Data Prep & Merge**
+- Asked: Load + merge OTB and events, apply business logic (dates, join keys, lead time, filter cancellations), output merged dataset
+- Got: `1_data_prep.py`, `merged_data.csv` — 28,276 rows; fan-out issue discovered, occupancy outliers flagged, missing event data identified
+
+🟡 **Step 2: Data Quality Audit**
+- Asked: Validate data ("one version of truth"), fix fan-out + outliers + accounting logic, create clean dataset
+- Got: `1b_data_patch.py`, `reconciled_data.csv` — 4,732 clean rows; fan-out resolved (1 row per hotel-date), occupancy capped, integrity confirmed
+
+🟠 **Step 3: Forecast Model**
+- Asked: Build explainable 90-day forecast (no black-box ML), use OTB + Pickup + Event Impact, output forecasts + charts
+- Got: `2_forecast_model.py`, `forecast_90days.csv` — 180-row forecast, 3 charts (Occupancy, RevPAR, Pickup), clear pickup + event weighting logic
+
+🔴 **Step 4: Presentation**
+- Asked: Translate results into interview-ready presentation with methodology, insights, recommendations
+- Got: `PRESENTATION.md` — full narrative + business insights + strategy, ready for screen-share interview
+
 **How I audit AI output (directly answering the JD's cover letter question):**
 
 - I don't verify syntax line-by-line. I test **outputs** against strict business boundaries:

@@ -1,6 +1,6 @@
 ---
 name: reconcile-data
-description: Validates "One version of the truth" before merging OTB and Events datasets. Use whenever user mentions data validation, join integrity, data merging, rooms_sold errors, market matching, occupancy anomalies, left_to_sell discrepancy, data reconciliation, or any data quality check. Required gate before entering forecast modeling (Phase 3+).
+description: Validates "One version of the truth" before merging OTB(on the books) and Events datasets. Use whenever user mentions data validation, join integrity, data merging, rooms_sold errors, market matching, occupancy anomalies, left_to_sell discrepancy, data reconciliation, or any data quality check. Required gate before entering forecast modeling (Phase 3+).
 ---
 
 # Data Reconciliation Skill

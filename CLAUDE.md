@@ -7,10 +7,11 @@ This project is a proof-of-concept (PoC) automated pipeline that combines OTB da
 2. **One Version of the Truth:** Data integrity is the top priority. When merging data from two systems (CSVs), verify no conflicts or missing records exist.
 3. **Scalable & Modular:** All Python code must be reusable functions — not one-off scripts. Build for easy integration into Pebblebrook's internal systems or a FastAPI environment.
 4. **Business Focused:** Avoid complex black-box models (e.g., deep learning). Use explainable, practical logic — time-series base multiplied by event weights — understandable to non-technical stakeholders.
+5. **No Machine Learning Apprach**: Don't use blackbox machine learning model, every data has to be traceable.
 
 BI Project
 
-Prompt: You have been tasked to help build a 90-day occupancy and revenue forecast for a hotel. Using the provided datasets and leveraging other technology as you see fit, develop said forecast and be prepared to present your methodology, findings and recommendations. We would ask that you don't spend more than 90 minutes on this project. Please note, there are no right/wrong answers; we are interested in seeing your logic and approach, rather than a perfect, production-ready model, and your ability to present your findings. There is no formal deliverable required, simply be prepared to share your screen and walk us through your scratchpad, code, or spreadsheet logic.
+Prompt: You have been taske`d to help build a 90-day occupancy and revenue forecast for a hotel. Using the provided datasets and leveraging other technology as you see fit, develop said forecast and be prepared to present your methodology, findings and recommendations. We would ask that you don't spend more than 90 minutes on this project. Please note, there are no right/wrong answers; we are interested in seeing your logic and approach, rather than a perfect, production-ready model, and your ability to present your findings. There is no formal deliverable required, simply be prepared to share your screen and walk us through your scratchpad, code, or spreadsheet logic.
 
  
 
