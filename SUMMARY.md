@@ -6,8 +6,6 @@
 
 ## 1. Potential Revenue Increment 
 
-**Constraints:** 90 minutes · 2 datasets (4,732 rows) — no black-box ML, every number traceable.
-
 **Three actions the model surfaces — combined upside ~$451K–$528K incremental revenue:**
 
 | Market | Action | Revenue |
