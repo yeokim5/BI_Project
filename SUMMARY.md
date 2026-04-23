@@ -58,7 +58,7 @@ COMMIT      →  Only proceed to next stage after audit passes
 
 **How I audit AI output (directly answering the JD's cover letter question):**
 
-- I don't verify syntax line-by-line. I test **outputs** against strict business boundaries:
+- I test **outputs** against strict business boundaries:
   - Occupancy ∈ [0, 1]
   - `rooms_sold + left_to_sell + ooo == total_rooms` for every row
   - `revenue_sold ≈ rooms_sold × adr_sold` within $1.50 rounding tolerance
