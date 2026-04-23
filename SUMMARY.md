@@ -111,7 +111,6 @@ Six nights at 100% occupancy. The room will sell regardless. Rate is the only qu
 **Watch list (85–89% occupancy)**
 Don't act yet. Check pickup velocity in 7 days. Promote to the tier above if occupancy hits 92%.
 
-Rate changes go live through PMS in 24–48 hours.
 
 ---
 
