@@ -6,7 +6,7 @@
 
 ## 1. Potential Revenue Increment 
 
-**Three actions the model surfaces — combined upside ~$451K–$528K incremental revenue:**
+**Two actions the model surfaces — combined upside ~$451K–$528K incremental revenue:**
 
 | Market | Action | Revenue |
 |---|---|---|
@@ -179,8 +179,6 @@ Don't lift yet. Monitor 7-day pickup velocity. Promote to Tier 2 if occ crosses 
 
 8–10 pt lift from soft-period promotion is the conservative end of the 8–12 pt industry range.
 
-### Rec 3 — Overbooking Review · Zero cost
-32 source rows show negative `left_to_sell` on Boston Apr 19–21. If intentional yield strategy → document it. If system defect → it's corrupting every downstream report. The answer costs nothing and is worth knowing.
 
 ---
 

@@ -59,9 +59,9 @@ data-events.csv: The data set includes markets' events spanning from the Jan 202
 
 ·                location: Venue for the Event (if applicable)
 
-·                visitors: Estimated number of visitors for the event
+·                visito`rs: Estimated number of visitors for the event
 
-·                influence_radius: The area of the market impacted by the event
+·                influence_`radius: The area of the market impacted by the event
 
 ·                lat: Latitude of the event
 
