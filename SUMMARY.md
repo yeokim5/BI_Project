@@ -194,7 +194,7 @@ Stated openly so the next iteration is obvious. Each gap is a build, not a block
 | **Not continuous** | Replace 26 static snapshots with live OTB stream → daily-refreshed forecast |
 | **CSV output** | Pipeline already returns DataFrames — point Tableau at the FastAPI endpoint for proactive ops reporting |
 
-**Architecture is already shaped for this.** Each stage is a function behind a clean boundary:
+**Architecture is already shaped for this.** Each stage is a function behind a clean boundary:`
 
 ```
 [Load CSVs]  →  [Reconcile / Audit]  →  [Forecast]  →  [Translate]
