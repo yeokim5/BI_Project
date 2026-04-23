@@ -24,7 +24,7 @@ The forecast found both. The recommendations fix both.
 For each future night, three questions:
 
 1. **What's already booked?** From OTB data — this is fact, not a prediction.
-2. **How many more will book before check-in?** Measured from 26 actual booking snapshots in the data. No borrowed industry curves.
+2. **How many more will book before check-in?** Measured from 26 actual booking snapshots in the data.
 3. **Is there an event pulling demand?** From events data, scaled by hotel size and capped so one festival doesn't distort the whole forecast.
 
 Add those three up. That's the occupancy forecast. Multiply by rate to get RevPAR.
