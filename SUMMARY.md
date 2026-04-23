@@ -6,7 +6,7 @@
 
 ## 1. How I Framed the Problem
 
-90-minute budget. Two CSVs. Non-technical stakeholders. Three constraints drove every decision:
+90-minute budget. Two CSVs. Three constraints drove every decision:
 
 | Constraint | Implication |
 |---|---|
