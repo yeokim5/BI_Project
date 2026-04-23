@@ -12,7 +12,6 @@
 |---|---|---|
 | Boston | Tiered pricing: 6 sellouts + 12 compression dates | ~$193K |
 | Santa Monica | Demand stimulation (Aug 4–Sep 13 soft window) | ~$258K–$335K |
-| Boston | Resolve overbooking anomaly (Apr 19–21) | Data integrity |
 
 The rest of this document shows how the model earns the right to make those calls — starting with how I keep the data honest, then the AI workflow, then the math, then the V2 roadmap.
 
