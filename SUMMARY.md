@@ -194,7 +194,7 @@ Stated openly so the next iteration is obvious. Each gap is a build, not a block
 | Gap Today | V2 Opportunity |
 |---|---|
 | **Not a rate forecast** — model says *where* to act, not what rate to set | Add price elasticity layer + comp-set data → optimal rate per night |
-| **Not competitor-aware** | Plug in Smith Travel / OTA comp-rate feed → react to market repricing |
+| **Not competitor-aware** | Plug in OTA(Online Travel Agency) comp-rate feed → react to market repricing |
 | **Not reactive to cancellations** | Single-date re-forecast endpoint (already modular) — wire to event cancellation feed |
 | **Not continuous** | Replace 26 static snapshots with live OTB stream → daily-refreshed forecast |
 | **CSV output** | Pipeline already returns DataFrames — point Tableau at the FastAPI endpoint for proactive ops reporting |
