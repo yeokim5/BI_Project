@@ -10,11 +10,11 @@
 
 **Three actions the model surfaces — combined upside ~$451K–$528K incremental revenue, all executable inside the next 30 days:**
 
-| # | Market | Action | Incremental Revenue | Time to Execute |
-|---|---|---|---|---|
-| 1 | **Boston** | Tiered rate program — 6 sellouts ($80 lift) + 12 compression dates ($30 lift) across Jul/Aug/Sep | **~$193K** | 24–48 hrs in PMS |
-| 2 | **Santa Monica** | Stimulate demand during Aug 4–Sep 13 soft window with targeted promotions | **~$258K–$335K** | 2–4 weeks (book window opens now) |
-| 3 | **Boston** | Investigate 32 overbooked rows (Apr 19–21) — confirm yield strategy or fix data defect | Zero cost, integrity gain | 1 week |
+| Market | Action | Revenue |
+|---|---|---|
+| Boston | Tiered pricing: 6 sellouts + 12 compression dates | ~$193K |
+| Santa Monica | Demand stimulation (Aug 4–Sep 13 soft window) | ~$258K–$335K |
+| Boston | Resolve overbooking anomaly (Apr 19–21) | Data integrity |
 
 The rest of this document shows how the model earns the right to make those calls — starting with how I keep the data honest, then the AI workflow, then the math, then the V2 roadmap.
 
