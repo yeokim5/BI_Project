@@ -6,7 +6,7 @@
 
 ## The Short Version
 
-Boston is nearly sold out for fall and charging the same rate on a Hans Zimmer sellout as on a slow Tuesday.
+Boston is nearly sold out for fall — and still underpricing its highest-demand nights.
 
 Santa Monica has 40% of rooms sitting empty for six straight weeks with no plan to fill them.
 
@@ -66,7 +66,7 @@ The forecast only ran after all three cleared.
 | Nights fully sold out | 26 of 90 |
 | Peak night | Sep 17 (Hans Zimmer) — $432 RevPAR |
 
-Boston guests book late. The data shows +56% of final occupancy comes in the last 90 days — a steep, fast curve. By the time a promotional rate would matter, the hotel is already full. The lever here is **rate, not volume**.
+Boston guests book late. The data shows 56 occupancy points — roughly two-thirds of final demand — still book within the 90-day window. By the time a promotional rate would matter, the hotel is already full. The lever here is **rate, not volume**.
 
 **Santa Monica — room to grow, and a deadline to act**
 
@@ -162,7 +162,7 @@ COMMIT      →  Only move to the next stage after the check passes
 
 | Stage | Agent / Skill | Output | What I verified |
 |---|---|---|---|
-| 🟢 Data Prep & Merge | `@pipeline-architect` | `1_data_prep.py`, `merged_data.csv` (28,276 rows) | Caught fan-out + occupancy outliers + missing event data |
+| 🟢 Data Prep & Merge | `@pipeline-architect` | `1_data_prep.py`, `merged_data.csv` (28,276 rows) | Caught fan-out + occupancy outliers + revenue integrity check |
 | 🟡 Reconcile / Audit | `/reconcile-data` skill | `1b_data_patch.py`, `reconciled_data.csv` (4,732 rows) | Fan-out resolved, occupancy capped, integrity confirmed |
 | 🟠 Forecast | `@pipeline-architect` | `2_forecast_model.py`, `forecast_90days.csv`, 3 charts | Formula audited row-by-row; zero residual |
 | 🔴 Translate | `@business-strategist` | `PRESENTATION.md`, `SUMMARY.md` | Every revenue figure cross-checked against CSV |
