@@ -38,26 +38,9 @@ Every number traces to a specific row. Nothing is a black box.
 
 ---
 
-## What I Found in the Data (Before Running a Single Forecast)
-
-Three problems surfaced immediately after loading the data.
-
-**The data was multiplying itself.**
-Joining the events and booking tables naively produced 28,276 rows from a join that should have preserved the original 4,732 OTB rows — a 6× inflation. Each event row was attaching to every booking row for that date. Fixed by pre-aggregating events to one row per date before joining. If this had gone unnoticed, every forecast number downstream would have been wrong.
-
-**Boston showed rooms sold beyond capacity.**
-32 date-rows showed occupancy above 100% — more rooms sold than exist. Either real overbooking or a system error. Capped at 100% for forecasting, flagged to operations. This became Recommendation 3.
-
-**Revenue math checked out.**
-ADR × rooms sold should equal revenue sold. Largest gap: $1.36. Rounding, not a problem. Accepted.
-
-The forecast only ran after all three cleared.
-
----
-
 ## What the Numbers Show
 
-**Boston — nearly full, leaving money on the table**
+### Boston — nearly full, leaving money on the table
 
 | Metric | Value |
 |---|---|
@@ -66,9 +49,15 @@ The forecast only ran after all three cleared.
 | Nights fully sold out | 26 of 90 |
 | Peak night | Sep 17 (Hans Zimmer) — $432 RevPAR |
 
-Boston guests book late. The data shows 56 occupancy points — roughly two-thirds of final demand — still book within the 90-day window. By the time a promotional rate would matter, the hotel is already full. The lever here is **rate, not volume**.
+Boston demand materializes strongly within the 90-day booking window. The data shows 56 occupancy points — roughly two-thirds of final demand — still book within this window. By the time a promotional rate would matter, the hotel is already full. The lever here is **rate, not volume**.
 
-**Santa Monica — room to grow, and a deadline to act**
+![Pickup Curves](charts/chart3_pickup_curve.png)
+
+![RevPAR Forecast](charts/chart2_revpar_forecast.png)
+
+---
+
+### Santa Monica — room to grow, and a deadline to act
 
 | Metric | Value |
 |---|---|
@@ -79,9 +68,7 @@ Boston guests book late. The data shows 56 occupancy points — roughly two-thir
 
 Santa Monica guests book 45–60 days out. That means April and May are the window to move August demand. Wait until July and those travelers have already booked elsewhere.
 
-![Pickup Curves](charts/chart3_pickup_curve.png)
 ![Occupancy Forecast](charts/chart1_occupancy_forecast.png)
-![RevPAR Forecast](charts/chart2_revpar_forecast.png)
 
 ---
 
@@ -89,8 +76,8 @@ Santa Monica guests book 45–60 days out. That means April and May are the wind
 
 Eighteen nights where the hotel has pricing power it isn't using. Three tiers:
 
-**Sellouts — raise rate by $80**
-Six nights at 100% occupancy. The room will sell regardless. Rate is the only question.
+**Tier 1 — Sellout Nights (+$80 ADR)**
+6 nights at 100% occupancy. The room will sell regardless. Rate is the only variable.
 
 | Date | Current ADR | Driver |
 |---|---|---|
@@ -103,14 +90,13 @@ Six nights at 100% occupancy. The room will sell regardless. Rate is the only qu
 
 `6 × 238 rooms × $80 ≈ $114K`
 
-**Near-sellouts (91–98% occupancy) — raise by $30**
-12 nights with strong demand and a few rooms left. A conservative $30 lift assumes some guests reprice out.
+**Tier 2 — Near-Sellout Nights (+$30 ADR)**
+12 nights at 91–98% occupancy. Strong demand, a few rooms left. Conservative $30 lift assumes some guests reprice out.
 
 `12 × 238 × 0.94 × $30 ≈ $80K`
 
-**Watch list (85–89% occupancy)**
-Don't act yet. Check pickup velocity in 7 days. Promote to the tier above if occupancy hits 92%.
-
+**Tier 3 — Watch List**
+85–89% occupancy. Monitor pickup over next 7 days. Promote to Tier 2 if occupancy hits 92%.
 
 ---
 
@@ -132,6 +118,23 @@ An 8–10 point lift from a targeted soft-period promotion is the low end of wha
 ## Recommendation 3 — Flag the Boston Overbooking
 
 32 date-rows in April showing occupancy above 100%. The data doesn't tell us whether that's intentional overbooking or a system sync issue — but Operations should know either way.
+
+---
+
+## Data Validation — Before Any Forecast Ran
+
+Three problems surfaced immediately after loading the data.
+
+**The data was multiplying itself.**
+Joining the events and booking tables naively produced 28,276 rows from a join that should have preserved the original 4,732 OTB rows — a 6× inflation. Each event row was attaching to every booking row for that date. Fixed by pre-aggregating events to one row per date before joining. If this had gone unnoticed, every forecast number downstream would have been wrong.
+
+**Boston showed rooms sold beyond capacity.**
+32 date-rows showed occupancy above 100% — more rooms sold than exist. Either real overbooking or a system error. Capped at 100% for forecasting, flagged to operations. This became Recommendation 3.
+
+**Revenue math checked out.**
+ADR × rooms sold should equal revenue sold. Largest gap: $1.36. Rounding, not a problem. Accepted.
+
+The forecast only ran after all three cleared.
 
 ---
 
