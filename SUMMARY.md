@@ -43,7 +43,7 @@ Every number traces to a specific row. Nothing is a black box.
 Three problems surfaced immediately after loading the data.
 
 **The data was multiplying itself.**
-Joining the events and booking tables naively produced 28,276 rows from two tables that should have produced 180. Each event row was attaching to every booking row for that date — a 6x inflation. Fixed by pre-aggregating events to one row per date. If this had gone unnoticed, every forecast number downstream would have been wrong.
+Joining the events and booking tables naively produced 28,276 rows from a join that should have preserved the original 4,732 OTB rows — a 6× inflation. Each event row was attaching to every booking row for that date. Fixed by pre-aggregating events to one row per date before joining. If this had gone unnoticed, every forecast number downstream would have been wrong.
 
 **Boston showed rooms sold beyond capacity.**
 32 date-rows showed occupancy above 100% — more rooms sold than exist. Either real overbooking or a system error. Capped at 100% for forecasting, flagged to operations. This became Recommendation 3.

@@ -214,14 +214,15 @@ Three reasons, say any one:
 
 ## Part 6 — The Recommendations (anchor every one to dollars)
 
-### Rec 1 — Boston rate fencing
-- Target: Sept 9, 16, 17, 26 (all at 100% occ, ADR ~$420)
-- Move ADR from ~$422 to $480–$520
-- **Math:** ~$78 lift × 238 rooms × 4 nights ≈ **$74,600 incremental**
+### Rec 1 — Boston rate program — ~$193K
+- **Tier 1 — 6 full sellout nights, raise ADR by $80:** 6 × 238 × $80 ≈ **$114K**
+  - Targets: Sept 17 ($432), Sept 9 ($427), Jul 16 ($425), Jul 15 ($422), Sept 16 ($422), Sept 26 ($405)
+- **Tier 2 — 12 near-sellout nights (91–98% occ), raise ADR by $30:** 12 × 238 × 0.94 × $30 ≈ **$80K**
+- **Watch list — 8 nights at 85–89% occ:** hold, check pickup velocity in 7 days, promote if hits 92%
 - Timeline: 24–48 hours in PMS
 
 ### Rec 2 — Santa Monica soft window
-- Target: Aug 4 – Sep 14 (52–65% occ, thin event calendar)
+- Target: Aug 4 – Sep 13 (41 nights, ~59% avg occ, thin event calendar)
 - Tactic: 3-night leisure discounts, direct-book corporate rates, group quotes
 - Launch: 45–60 days before (late June) — steepest pickup is 30–60 day window
 - **Math:** +8–10 occ points × 42 days ≈ 1,000–1,300 room nights ≈ **$258K–$335K**
