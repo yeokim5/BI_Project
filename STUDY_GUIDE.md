@@ -260,7 +260,114 @@ Three reasons, say any one:
 
 ---
 
-## Part 8 — The Trap to Avoid
+## Part 8 — Deep Concept Q&A (understand these, don't memorize)
+
+### What does `aggregate_events()` actually output?
+
+Input: raw events CSV — many rows per market/date (e.g. 3 events in Boston on July 4).
+
+Output: **one row per (market, date)** with:
+- `event_count` — how many events on that day
+- `total_visitors` — sum of all event visitors for that day
+- `top_category` — most common event category
+- `event_names` — up to 3 names joined with " | "
+- `has_event` — True
+
+Why it matters: without this, joining raw events × OTB multiplies rows. 3 events on one date = 3 copies of every OTB row for that date = 6× fan-out.
+
+---
+
+### How does `fix_occupancy_outliers()` actually work?
+
+It does NOT exclude overbooking rows. It **clamps** them.
+
+```
+occupancy_safe = rooms_sold / total_rooms  → clip(upper=1.0)
+```
+
+Example: rooms_sold=320, total_rooms=315 → occupancy was 1.016 → becomes 1.0.
+`rooms_sold` stays at 320 (the truth is preserved). Only the ratio is capped for model math safety.
+Only rows where original occupancy < 0 or > 1 get patched. Normal rows untouched.
+
+---
+
+### Why is `forecast_occupancy = current + pickup + event_weight` an addition?
+
+Each term is a separate independent fraction of total_rooms:
+
+| Term | What it means | Example |
+|------|--------------|---------|
+| `current_occupancy` | already booked today | 0.65 (65% sold) |
+| `pickup_rate` | history says X% more rooms book before arrival | +0.12 |
+| `event_weight` | event demand lifts occ by Y% | +0.05 |
+| **Sum** | expected final occupancy | **0.82** |
+
+They're additive because each is an independent contribution — current = committed, pickup = historical pattern, event = external demand signal. Stack them → final expected occupancy. Cap at 1.0 because a hotel can't be more than 100% occupied (code: `.clip(upper=1.0)`).
+
+---
+
+### What are "snapshot dates" in the OTB data?
+
+Snapshot = a photo of reservations taken on a specific date.
+
+The same future arrival date (business_date) appears at 26 snapshot dates because the PMS exported data 26 times across different dates:
+```
+Snapshot Jan 1  →  July 4 has 20 rooms sold
+Snapshot Feb 1  →  July 4 has 45 rooms sold
+Snapshot Mar 1  →  July 4 has 80 rooms sold
+...
+Snapshot Jun 29 →  July 4 has 98 rooms sold
+```
+
+This is the **booking curve** — how reservations accumulate over time. 26 snapshots × future dates = raw material for computing pickup rates.
+
+---
+
+### Why is `lead_time ≤ 5` hardcoded in pickup rate calc?
+
+The code needs "rooms at check-in" — the true final demand for a date. Hotel systems don't always export exactly on arrival day (lead_time=0). So ≤5 days from arrival is close enough to be considered final demand. If the nearest snapshot is 6+ days out, final-rooms data isn't reliable enough → skip that date to avoid distorting the pickup calculation. Business rule, not math. Could be 3 or 7; 5 is reasonable.
+
+---
+
+### How did the pickup rate buckets (21, 30, 45, 60, 90 days) come out?
+
+Goal: measure how many rooms get added AFTER a given lead time.
+
+Example for bucket = 60 days:
+```
+At lead_time=60:  40 rooms sold
+At check-in:     100 rooms sold
+additional = 100 - 40 = 60 rooms picked up
+pickup_rate = 60 / 315 = 19% of total rooms
+```
+
+Meaning: if a date is currently 60 days away with 40 rooms on books, history says expect 19% more rooms to book. Apply that to the forecast.
+
+Repeat for 90, 45, 30, 21, 14, 7 days. Average across all historical dates. You get a curve: further out = more pickup expected, closer in = less.
+
+---
+
+### Why divide visitor count by 1,000 for event_weight?
+
+**Scaling problem**: visitors is a raw count (5,000), occupancy is a fraction (0–1). Need a conversion.
+
+```
+visitor_density = 5,000 visitors / 315 rooms = 15.87 visitors per room
+event_weight = 15.87 / 1000 = 0.016 → 1.6% occupancy lift
+```
+
+The 1,000 is a calibration constant — not all visitors stay in this specific hotel, many are day-trippers. Applying raw counts without damping gives absurd results.
+
+**Without the cap (why it's needed):** Harborfest = 2M visitors, 238 rooms.
+```
+density = 2,000,000 / 238 = 8,403
+/ 1000 → 8.4 occupancy lift  ← still way above 1.0
+```
+Even with /1000, giant events blow past 100%. The `EVENT_WEIGHT_CAP = 0.15` limits max event lift to 15% regardless of event size. Without the cap, any mega-event pushes forecast to 100% and masks the actual pickup signal.
+
+---
+
+## Part 9 — The Trap to Avoid
 
 Reid asks: *"What does line 47 do?"*
 
