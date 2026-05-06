@@ -40,6 +40,10 @@ Every number traces to a specific row. Nothing is a black box.
 
 ## What the Numbers Show
 
+![Occupancy Forecast](charts/chart1_occupancy_forecast.png)
+![RevPAR Forecast](charts/chart2_revpar_forecast.png)
+![Pickup Curves](charts/chart3_pickup_curve.png)
+
 ### Boston — nearly full, leaving money on the table
 
 | Metric | Value |
@@ -50,10 +54,6 @@ Every number traces to a specific row. Nothing is a black box.
 | Peak night | Sep 17 (Hans Zimmer) — $432 RevPAR |
 
 Boston demand materializes strongly within the 90-day booking window. The data shows 56 occupancy points — roughly two-thirds of final demand — still book within this window. By the time a promotional rate would matter, the hotel is already full. The lever here is **rate, not volume**.
-
-![Pickup Curves](charts/chart3_pickup_curve.png)
-
-![RevPAR Forecast](charts/chart2_revpar_forecast.png)
 
 ---
 
@@ -67,8 +67,6 @@ Boston demand materializes strongly within the 90-day booking window. The data s
 | Nights fully sold out | 0 of 90 |
 
 Santa Monica guests book 45–60 days out. That means April and May are the window to move August demand. Wait until July and those travelers have already booked elsewhere.
-
-![Occupancy Forecast](charts/chart1_occupancy_forecast.png)
 
 ---
 
