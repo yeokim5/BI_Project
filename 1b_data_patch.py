@@ -95,6 +95,20 @@ def build_reconciled_dataset(df_otb: pd.DataFrame, df_events_agg: pd.DataFrame) 
     return merged
 
 
+def check_rooms_balance(df: pd.DataFrame) -> None:
+    """Verify rooms_sold + left_to_sell + ooo = total_rooms on every row."""
+    df = df.copy()
+    df["total_rooms"] = df["hotel_code"].map(TOTAL_ROOMS)
+    df["rooms_sum"] = df["rooms_sold"] + df["left_to_sell"] + df["ooo"]
+    bad = df[df["rooms_sum"] != df["total_rooms"]]
+    print(f"[rooms_balance] Rows where rooms_sold + left_to_sell + ooo ≠ total_rooms: {len(bad)}")
+    if len(bad):
+        print(bad[["hotel_code", "snapshot_date", "business_date", "rooms_sold",
+                   "left_to_sell", "ooo", "total_rooms", "rooms_sum"]].head(10).to_string())
+    else:
+        print("[rooms_balance] All rows balance exactly.")
+
+
 def validate_final(df: pd.DataFrame) -> None:
     # True PK = hotel + snapshot + business date (booking curve = multiple snapshots per future date)
     dupes = df.duplicated(["hotel_code", "snapshot_date", "business_date"]).sum()
@@ -131,6 +145,9 @@ if __name__ == "__main__":
 
     print("\n--- Final Merge ---")
     df_final = build_reconciled_dataset(df_otb_clean, df_events_agg)
+
+    print("\n--- Rooms Balance Check ---")
+    check_rooms_balance(df_final)
 
     print("\n--- Final Validation ---")
     validate_final(df_final)

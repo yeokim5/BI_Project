@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pebblebrook 90-Day Forecast</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #f5f6f8;
+    color: #1a1a2e;
+  }
+
+  /* MAIN */
+  main {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 56px 48px;
+  }
+
+  h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1e3a5f;
+    margin-bottom: 6px;
+  }
+
+  .subtitle {
+    font-size: 16px;
+    color: #555;
+    margin-bottom: 40px;
+    font-style: italic;
+  }
+
+  h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1e3a5f;
+    margin: 48px 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #1e3a5f;
+  }
+
+  h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1e3a5f;
+    margin: 28px 0 12px;
+  }
+
+  h4 {
+    font-size: 14px;
+    font-weight: 700;
+    color: #444;
+    margin: 24px 0 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  p {
+    font-size: 15px;
+    line-height: 1.7;
+    color: #333;
+    margin-bottom: 14px;
+  }
+
+  /* CALLOUT BOX */
+  .callout {
+    background: #1e3a5f;
+    color: #fff;
+    border-radius: 8px;
+    padding: 24px 28px;
+    margin-bottom: 32px;
+  }
+
+  .callout p { color: rgba(255,255,255,0.9); margin-bottom: 8px; font-size: 15px; }
+  .callout p:last-child { margin-bottom: 0; }
+  .callout strong { color: #fff; }
+
+  /* UPSIDE BADGE */
+  .upside {
+    display: inline-block;
+    background: #e8f5e9;
+    color: #2e7d32;
+    font-weight: 700;
+    font-size: 22px;
+    padding: 12px 24px;
+    border-radius: 6px;
+    margin-bottom: 24px;
+  }
+
+  /* TABLES */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0 24px;
+    font-size: 14px;
+  }
+
+  th {
+    background: #1e3a5f;
+    color: #fff;
+    text-align: left;
+    padding: 10px 14px;
+    font-weight: 600;
+  }
+
+  td {
+    padding: 9px 14px;
+    border-bottom: 1px solid #e0e0e0;
+    color: #333;
+  }
+
+  tr:nth-child(even) td { background: #f9fafb; }
+  tr:hover td { background: #eef2f7; }
+
+  /* FORMULA BOX */
+  .formula {
+    background: #f0f4f8;
+    border-left: 4px solid #1e3a5f;
+    border-radius: 0 6px 6px 0;
+    padding: 16px 20px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 13px;
+    color: #1e3a5f;
+    margin: 16px 0 24px;
+    line-height: 1.8;
+    white-space: pre;
+  }
+
+  /* INLINE CODE */
+  code {
+    background: #eef2f7;
+    color: #1e3a5f;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 13px;
+  }
+
+  /* MATH CALLOUT */
+  .math {
+    background: #fff8e1;
+    border: 1px solid #ffe082;
+    border-radius: 6px;
+    padding: 10px 16px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 13px;
+    color: #5d4037;
+    margin: 8px 0 16px;
+    display: inline-block;
+  }
+
+  /* TIER BOXES */
+  .tier {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin-bottom: 16px;
+    background: #fff;
+  }
+
+  .tier.t1 { border-left: 5px solid #c62828; }
+  .tier.t2 { border-left: 5px solid #ef6c00; }
+  .tier.t3 { border-left: 5px solid #2e7d32; }
+
+  .tier-label {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+
+  .t1 .tier-label { color: #c62828; }
+  .t2 .tier-label { color: #ef6c00; }
+  .t3 .tier-label { color: #2e7d32; }
+
+  .tier-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin-bottom: 6px;
+  }
+
+  .tier p { margin-bottom: 0; font-size: 14px; }
+
+  /* CHARTS */
+  .charts-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    margin: 24px 0;
+  }
+
+  .charts-grid img {
+    width: 100%;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+  }
+
+  .chart-full {
+    margin: 16px 0;
+  }
+
+  .chart-full img {
+    width: 100%;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+  }
+
+  .chart-label {
+    font-size: 12px;
+    color: #888;
+    text-align: center;
+    margin-top: 4px;
+    margin-bottom: 16px;
+  }
+
+  /* METRIC CARDS */
+  .metric-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin: 16px 0 24px;
+  }
+
+  .metric-card {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 14px 16px;
+    text-align: center;
+  }
+
+  .metric-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1e3a5f;
+    margin-bottom: 4px;
+  }
+
+  .metric-label {
+    font-size: 11px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* VALIDATION ITEMS */
+  .validation-item {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 12px;
+  }
+
+  .validation-item.warn { border-left: 5px solid #ef6c00; }
+  .validation-item.ok   { border-left: 5px solid #2e7d32; }
+  .validation-item.flag { border-left: 5px solid #c62828; }
+
+  .validation-item strong { color: #1a1a2e; }
+
+  /* PIPELINE TABLE */
+  .pipeline-table th:first-child { width: 160px; }
+
+  /* OL / UL */
+  ol, ul {
+    padding-left: 22px;
+    margin-bottom: 16px;
+  }
+
+  li {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #333;
+    margin-bottom: 6px;
+  }
+
+  li strong { color: #1a1a2e; }
+
+  /* DIVIDER */
+  hr {
+    border: none;
+    border-top: 1px solid #e0e0e0;
+    margin: 40px 0;
+  }
+
+  /* CHECKLIST */
+  .checklist {
+    list-style: none;
+    padding-left: 0;
+    margin-bottom: 16px;
+  }
+
+  .checklist li {
+    padding: 6px 0 6px 28px;
+    position: relative;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .checklist li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: #2e7d32;
+    font-weight: 700;
+  }
+
+  /* SECTION ANCHOR */
+  section { scroll-margin-top: 24px; }
+</style>
+</head>
+<body>
+
+<main>
+
+  <h1>Pebblebrook 90-Day Forecast</h1>
+  <p class="subtitle">Two hotels with opposite problems — and $451K–$528K sitting on the table.</p>
+
+  <!-- SHORT VERSION -->
+  <section id="short">
+    <h2>The Short Version</h2>
+    <div class="callout">
+      <p>Boston is nearly sold out for fall — and still underpricing its highest-demand nights.</p>
+      <p>Santa Monica has 40% of rooms sitting empty for six straight weeks with no plan to fill them.</p>
+      <p><strong>The forecast found both. The recommendations fix both.</strong></p>
+    </div>
+
+    <table>
+      <thead>
+        <tr><th>Hotel</th><th>Problem</th><th>Action</th><th>Revenue</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Boston</strong></td>
+          <td>Underselling 18 high-demand nights</td>
+          <td>Tiered rate increase by occupancy band</td>
+          <td><strong>~$193K</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Santa Monica</strong></td>
+          <td>41-night soft window at 59% occupancy</td>
+          <td>Targeted promotion — act now, guests decide in April–May</td>
+          <td><strong>~$258K–$335K</strong></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section id="how">
+    <h2>How the Forecast Works</h2>
+    <p>For each future night, three questions:</p>
+    <ol>
+      <li><strong>What's already booked?</strong> From OTB data — this is fact, not a prediction.</li>
+      <li><strong>How many more will book before check-in?</strong> Measured from 26 actual booking snapshots in the data.</li>
+      <li><strong>Is there an event pulling demand?</strong> From events data, scaled by hotel size and capped so one festival doesn't distort the whole forecast.</li>
+    </ol>
+
+    <div class="formula">
+      Forecast Occupancy  =  Already Booked  +  Expected Pickup  +  Event Lift   (max 100%)<br>
+      Forecast RevPAR     =  Forecast Occupancy  ×  Current ADR
+    </div>
+
+    <p>Every number traces to a specific row. Nothing is a black box.</p>
+
+    <h4>How Pickup Rate Is Calculated</h4>
+    <p>Each business_date appears across multiple OTB snapshots — that progression is the booking curve for that stay date.</p>
+    <ol>
+      <li><strong>Track the booking curve</strong> — observe how reservations accumulate across snapshots for each stay date</li>
+      <li><strong>Define final demand</strong> — use the closest snapshot to check-in (~5 days out) as the final demand proxy</li>
+      <li><strong>Measure remaining pickup per bucket</strong> — for each lead-time bucket (90d, 60d, 30d, 14d, 7d):<br>
+        <code>remaining pickup = final booked rooms − rooms booked at that bucket</code> → converted to % of total rooms</li>
+      <li><strong>Average across all dates</strong> — repeat for every historical stay date, then average by bucket → one pickup curve per hotel</li>
+    </ol>
+
+    <h4>How Event Weight Is Calculated</h4>
+    <p>Each stay date is matched to events in the same market. Visitor counts are aggregated, normalized by hotel size, then dampened and capped into an occupancy lift factor.</p>
+    <ol>
+      <li><strong>Match events</strong> — find all events in the same market on that stay date</li>
+      <li><strong>Sum visitors</strong> — aggregate expected visitors across all matching events</li>
+      <li><strong>Normalize by hotel size</strong> — <code>visitor density = total visitors / total rooms</code> (demand pressure relative to capacity)</li>
+      <li><strong>Convert to occupancy lift</strong> — <code>event weight = visitor density / 1000</code> (damping: not every visitor stays at this hotel), capped at 15% to prevent mega-events from distorting the forecast</li>
+    </ol>
+  </section>
+
+  <!-- NUMBERS -->
+  <section id="numbers">
+    <h2>What the Numbers Show</h2>
+
+    <div class="charts-grid">
+      <div>
+        <img src="charts/chart1_occupancy_forecast.png" alt="Occupancy Forecast">
+        <div class="chart-label">Occupancy Forecast — Both Hotels</div>
+      </div>
+      <div>
+        <img src="charts/chart2_revpar_forecast.png" alt="RevPAR Forecast">
+        <div class="chart-label">RevPAR Forecast — Both Hotels</div>
+      </div>
+    </div>
+    <div class="chart-full">
+      <img src="charts/chart3_pickup_curve.png" alt="Pickup Curves">
+      <div class="chart-label">Pickup Curves — How Each Hotel Books Over Time</div>
+    </div>
+
+    <h3>Boston — nearly full, leaving money on the table</h3>
+    <div class="metric-grid">
+      <div class="metric-card">
+        <div class="metric-value">88.7%</div>
+        <div class="metric-label">Avg Occupancy</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value">$298.91</div>
+        <div class="metric-label">Avg RevPAR</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value">26 / 90</div>
+        <div class="metric-label">Nights Sold Out</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value">$432</div>
+        <div class="metric-label">Peak RevPAR (Sep 17)</div>
+      </div>
+    </div>
+    <p>Boston demand materializes strongly within the 90-day booking window. The data shows 56 occupancy points — roughly two-thirds of final demand — still book within this window. By the time a promotional rate would matter, the hotel is already full. The lever here is <strong>rate, not volume</strong>.</p>
+
+    <hr>
+
+    <h3>Santa Monica — room to grow, and a deadline to act</h3>
+    <div class="metric-grid">
+      <div class="metric-card">
+        <div class="metric-value">62.0%</div>
+        <div class="metric-label">Avg Occupancy</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value">$157.46</div>
+        <div class="metric-label">Avg RevPAR</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value">41 nights</div>
+        <div class="metric-label">Soft Window</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value">0 / 90</div>
+        <div class="metric-label">Nights Sold Out</div>
+      </div>
+    </div>
+    <p>Santa Monica guests book 45–60 days out. That means April and May are the window to move August demand. Wait until July and those travelers have already booked elsewhere.</p>
+  </section>
+
+  <!-- REC 1 -->
+  <section id="rec1">
+    <h2>Recommendation 1 — Boston Rate Program · ~$193K</h2>
+    <p>Eighteen nights where the hotel has pricing power it isn't using. Three tiers:</p>
+
+    <div class="tier t1">
+      <div class="tier-label">Tier 1</div>
+      <div class="tier-title">Sellout Nights — +$80 ADR</div>
+      <p>6 nights at 100% occupancy. The room will sell regardless. Rate is the only variable.</p>
+    </div>
+
+    <table>
+      <thead><tr><th>Date</th><th>Current ADR</th><th>Driver</th></tr></thead>
+      <tbody>
+        <tr><td>Sep 17</td><td>$432</td><td>Hans Zimmer</td></tr>
+        <tr><td>Sep 9</td><td>$427</td><td>Translational Digital Pathology Summit</td></tr>
+        <tr><td>Jul 16</td><td>$425</td><td>Process Dev Cell Therapies Summit</td></tr>
+        <tr><td>Jul 15</td><td>$422</td><td>Weird Al @ Boch Center</td></tr>
+        <tr><td>Sep 16</td><td>$422</td><td>LSX World Congress USA</td></tr>
+        <tr><td>Sep 26</td><td>$405</td><td>John Mulaney @ Boch Center</td></tr>
+      </tbody>
+    </table>
+    <div class="math">6 × 238 rooms × $80 ≈ $114K</div>
+
+    <div class="tier t2">
+      <div class="tier-label">Tier 2</div>
+      <div class="tier-title">Near-Sellout Nights — +$30 ADR</div>
+      <p>12 nights at 91–98% occupancy. Strong demand, a few rooms left. Conservative $30 lift assumes some guests reprice out.</p>
+    </div>
+    <div class="math">12 × 238 × 0.94 × $30 ≈ $80K</div>
+
+    <div class="tier t3">
+      <div class="tier-label">Tier 3</div>
+      <div class="tier-title">Watch List</div>
+      <p>85–89% occupancy. Monitor pickup over next 7 days. Promote to Tier 2 if occupancy hits 92%.</p>
+    </div>
+  </section>
+
+  <!-- REC 2 -->
+  <section id="rec2">
+    <h2>Recommendation 2 — Santa Monica Demand Push · ~$258K–$335K</h2>
+    <p>Six weeks. No major events. School back in session. Leisure travel drops. The forecast shows 4 in 10 rooms empty every night from Aug 4 to Sep 13.</p>
+    <p>The window to act is now — Santa Monica guests are making August plans in April and May.</p>
+
+    <table>
+      <thead><tr><th>Scenario</th><th>Extra Rooms/Night</th><th>41 nights × $258 ADR</th></tr></thead>
+      <tbody>
+        <tr><td>Conservative (8 pt occupancy lift)</td><td>25 rooms</td><td><strong>~$265K</strong></td></tr>
+        <tr><td>Optimistic (10 pt lift)</td><td>31 rooms</td><td><strong>~$328K</strong></td></tr>
+      </tbody>
+    </table>
+    <p>An 8–10 point lift from a targeted soft-period promotion is the low end of what these campaigns typically deliver.</p>
+  </section>
+
+  <!-- REC 3 -->
+  <section id="rec3">
+    <h2>Recommendation 3 — Flag the Boston Overbooking</h2>
+    <p>32 date-rows in April showing occupancy above 100%. The data doesn't tell us whether that's intentional overbooking or a system sync issue — but Operations should know either way.</p>
+  </section>
+
+  <!-- VALIDATION -->
+  <section id="validation">
+    <h2>Data Validation — Before Any Forecast Ran</h2>
+    <p>Three problems surfaced immediately after loading the data.</p>
+
+    <div class="validation-item flag">
+      <p><strong>The data was multiplying itself.</strong><br>
+      Joining the events and booking tables naively produced 28,276 rows from a join that should have preserved the original 4,732 OTB rows — a 6× inflation. Each event row was attaching to every booking row for that date. Fixed by pre-aggregating events to one row per date before joining. If this had gone unnoticed, every forecast number downstream would have been wrong.</p>
+    </div>
+
+    <div class="validation-item warn">
+      <p><strong>Boston showed rooms sold beyond capacity.</strong><br>
+      32 date-rows showed occupancy above 100% — more rooms sold than exist. Either real overbooking or a system error. Capped at 100% for forecasting, flagged to operations. This became Recommendation 3.</p>
+    </div>
+
+    <div class="validation-item ok">
+      <p><strong>Revenue math checked out.</strong><br>
+      ADR × rooms sold should equal revenue sold. Largest gap: $1.36. Rounding, not a problem. Accepted.</p>
+    </div>
+
+    <p>The forecast only ran after all three cleared.</p>
+  </section>
+
+  <!-- HOW I BUILT -->
+  <section id="built">
+    <h2>How I Built This — AI as Co-Pilot, Not Autopilot</h2>
+    <p>I act as the decision-maker; AI agents handle the syntax. Architecture first, code second. Every AI output gets verified against the actual data before anything downstream runs.</p>
+
+    <h4>The loop I ran for every stage</h4>
+    <div class="formula">
+SPEC        →  Write the business constraint before any code
+DECOMPOSE   →  Break into independent, testable stages
+GENERATE    →  Delegate boilerplate to the agent (joins, chart scaffolding, column math)
+VERIFY      →  Check output against the data — not the AI's explanation of the data
+COMMIT      →  Only move to the next stage after the check passes
+    </div>
+
+    <h4>Stages in practice</h4>
+    <table class="pipeline-table">
+      <thead><tr><th>Stage</th><th>Agent / Skill</th><th>Output</th><th>What I verified</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>🟢 Data Prep</td>
+          <td><code>@pipeline-architect</code></td>
+          <td><code>1_data_prep.py</code>, <code>merged_data.csv</code> (28,276 rows)</td>
+          <td>Caught fan-out + occupancy outliers + revenue integrity check</td>
+        </tr>
+        <tr>
+          <td>🟡 Reconcile</td>
+          <td><code>/reconcile-data</code></td>
+          <td><code>1b_data_patch.py</code>, <code>reconciled_data.csv</code> (4,732 rows)</td>
+          <td>Fan-out resolved, occupancy capped, integrity confirmed</td>
+        </tr>
+        <tr>
+          <td>🟠 Forecast</td>
+          <td><code>@pipeline-architect</code></td>
+          <td><code>2_forecast_model.py</code>, <code>forecast_90days.csv</code>, 3 charts</td>
+          <td>Formula audited row-by-row; zero residual</td>
+        </tr>
+        <tr>
+          <td>🔴 Translate</td>
+          <td><code>@business-strategist</code></td>
+          <td><code>SUMMARY.md</code></td>
+          <td>Every revenue figure cross-checked against CSV</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h4>Why verification can't be skipped</h4>
+    <p>The fan-out error — data inflating 6x — wasn't flagged by the AI. It surfaced when I checked row counts manually. The AI wrote the merge code without error; the data problem was invisible to it. AI is fast and fluent. It doesn't know when it's wrong.</p>
+
+    <h4>Four checks every number had to clear</h4>
+    <ul class="checklist">
+      <li>Occupancy ∈ [0%, 100%] on every row</li>
+      <li><code>rooms_sold + left_to_sell + ooo = total_rooms</code> exactly</li>
+      <li><code>ADR × rooms_sold ≈ revenue_sold</code> within $1.50 tolerance</li>
+      <li>Event join must not increase row count</li>
+    </ul>
+
+    <p>This is the same pattern I built at OMEL AI for enterprise chatbots — intercept output, validate against domain rules, block anything that can't be proven. That layer is what turns "AI-generated" into "production-trustable."</p>
+  </section>
+
+  <!-- NEXT -->
+  <section id="next">
+    <h2>What Would Make This Better</h2>
+    <table>
+      <thead><tr><th>What's missing today</th><th>What it would take</th></tr></thead>
+      <tbody>
+        <tr><td>Optimal rate recommendation (not just "raise it")</td><td>Price elasticity layer + comp-set data</td></tr>
+        <tr><td>Competitor awareness</td><td>OTA comp-rate feed — react when others reprice</td></tr>
+        <tr><td>Live updates</td><td>Replace 26 static snapshots with daily OTB stream</td></tr>
+        <tr><td>Cancellation response</td><td>Already modular — wire to event cancellation feed</td></tr>
+        <tr><td>Dashboard visibility</td><td>Output connects directly to Tableau via FastAPI endpoint</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+</main>
+
+
+</body>
+</html>
