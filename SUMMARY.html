@@ -509,30 +509,7 @@
   <!-- REC 3 -->
   <section id="rec3">
     <h2>Recommendation 3 — Flag the Boston Overbooking</h2>
-    <p>32 date-rows in April showing occupancy above 100%. The data doesn't tell us whether that's intentional overbooking or a system sync issue — but Operations should know either way.</p>
-  </section>
-
-  <!-- VALIDATION -->
-  <section id="validation">
-    <h2>Data Validation — Before Any Forecast Ran</h2>
-    <p>Three problems surfaced immediately after loading the data.</p>
-
-    <div class="validation-item flag">
-      <p><strong>The data was multiplying itself.</strong><br>
-      Joining the events and booking tables naively produced 28,276 rows from a join that should have preserved the original 4,732 OTB rows — a 6× inflation. Each event row was attaching to every booking row for that date. Fixed by pre-aggregating events to one row per date before joining. If this had gone unnoticed, every forecast number downstream would have been wrong.</p>
-    </div>
-
-    <div class="validation-item warn">
-      <p><strong>Boston showed rooms sold beyond capacity.</strong><br>
-      32 date-rows showed occupancy above 100% — more rooms sold than exist. Either real overbooking or a system error. Capped at 100% for forecasting, flagged to operations. This became Recommendation 3.</p>
-    </div>
-
-    <div class="validation-item ok">
-      <p><strong>Revenue math checked out.</strong><br>
-      ADR × rooms sold should equal revenue sold. Largest gap: $1.36. Rounding, not a problem. Accepted.</p>
-    </div>
-
-    <p>The forecast only ran after all three cleared.</p>
+    <p>32 rows in the OTB data show Boston occupancy above 100% — 26 concentrated around April 19–21, with 6 additional rows scattered across Jan, Mar, May, and Jun. Hotel_b has 238 rooms; these rows show 239–270 rooms sold. The data doesn't tell us whether that's intentional overbooking or a system sync issue — but Operations should know either way.</p>
   </section>
 
   <!-- HOW I BUILT -->
@@ -547,6 +524,29 @@ DECOMPOSE   →  Break into independent, testable stages
 GENERATE    →  Delegate boilerplate to the agent (joins, chart scaffolding, column math)
 VERIFY      →  Check output against the data — not the AI's explanation of the data
 COMMIT      →  Only move to the next stage after the check passes
+    </div>
+
+    <h4>Agents &amp; Skills Built for This Project</h4>
+
+    <div class="tier t1" style="border-left-color:#1e3a5f; margin-bottom:16px;">
+      <div class="tier-label" style="color:#1e3a5f;">Custom Agent</div>
+      <div class="tier-title"><code>@pipeline-architect</code></div>
+      <p style="margin-bottom:8px;">Purpose-built data engineering agent. Given a task, it designs and writes modular Python pipeline stages — data loading, preprocessing, feature engineering, forecast math — then executes them via Bash and iterates until output is clean. Constrained by <code>CLAUDE.md</code>: no ML black boxes, every number traceable, functions only (no monolithic scripts).</p>
+      <p><strong>Trigger:</strong> Invoked whenever a new pipeline stage needed to be built or debugged — data prep, fan-out fix, forecast model, chart generation.</p>
+    </div>
+
+    <div class="tier t2" style="border-left-color:#2e7d32; margin-bottom:16px;">
+      <div class="tier-label" style="color:#2e7d32;">Custom Agent</div>
+      <div class="tier-title"><code>@business-strategist</code></div>
+      <p style="margin-bottom:8px;">Revenue management specialist agent. Takes verified forecast output (CSV + charts) and translates it into quantified business actions — RevPAR impact, occupancy band tiers, revenue upside estimates. Writes in executive voice, always ties metrics back to dollar impact. Rejects vague recommendations in favor of specific, defensible numbers.</p>
+      <p><strong>Trigger:</strong> Invoked after forecast CSV was verified — turned <code>forecast_90days.csv</code> into Rec 1 ($193K rate tiers) and Rec 2 ($258K–$335K soft window push).</p>
+    </div>
+
+    <div class="tier t3" style="border-left-color:#ef6c00; margin-bottom:24px;">
+      <div class="tier-label" style="color:#ef6c00;">Custom Skill (Hard Gate)</div>
+      <div class="tier-title"><code>/reconcile-data</code></div>
+      <p style="margin-bottom:8px;">A mandatory validation checkpoint — not a helper, a blocker. Runs 4 checks in sequence: schema &amp; type validation, rooms accounting check (<code>rooms_sold + ooo + left_to_sell = total_rooms</code>), join key integrity (OTB <code>location</code> ↔ Events <code>market</code>), and fan-out detection (row count must not increase after merge). If any check fails, the pipeline stops. Forecast cannot run until all four pass.</p>
+      <p><strong>Trigger:</strong> Ran once between data prep and forecast stages. Caught the 6× fan-out and the 32 overbooking rows before a single forecast number was produced.</p>
     </div>
 
     <h4>Stages in practice</h4>
@@ -592,6 +592,29 @@ COMMIT      →  Only move to the next stage after the check passes
     </ul>
 
     <p>This is the same pattern I built at OMEL AI for enterprise chatbots — intercept output, validate against domain rules, block anything that can't be proven. That layer is what turns "AI-generated" into "production-trustable."</p>
+  </section>
+
+  <!-- VALIDATION -->
+  <section id="validation">
+    <h2>Data Validation — Before Any Forecast Ran</h2>
+    <p>Three problems surfaced immediately after loading the data.</p>
+
+    <div class="validation-item flag">
+      <p><strong>The data was multiplying itself.</strong><br>
+      Joining the events and booking tables naively produced 28,276 rows from a join that should have preserved the original 4,732 OTB rows — a 6× inflation. Each event row was attaching to every booking row for that date. Fixed by pre-aggregating events to one row per date before joining. If this had gone unnoticed, every forecast number downstream would have been wrong.</p>
+    </div>
+
+    <div class="validation-item warn">
+      <p><strong>Boston showed rooms sold beyond capacity.</strong><br>
+      32 rows showed occupancy above 100% — 26 concentrated around April 19–21, 6 scattered across other months. Hotel_b has 238 rooms; affected rows show 239–270 rooms sold. Either real overbooking or a system error. Capped at 100% for forecasting, flagged to operations. This became Recommendation 3.</p>
+    </div>
+
+    <div class="validation-item ok">
+      <p><strong>Revenue math checked out.</strong><br>
+      ADR × rooms sold should equal revenue sold. Largest gap: $1.36. Rounding, not a problem. Accepted.</p>
+    </div>
+
+    <p>The forecast only ran after all three cleared.</p>
   </section>
 
   <!-- NEXT -->

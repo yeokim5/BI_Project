@@ -134,7 +134,7 @@ An 8–10 point lift from a targeted soft-period promotion is the low end of wha
 
 ## Recommendation 3 — Flag the Boston Overbooking
 
-32 date-rows in April showing occupancy above 100%. The data doesn't tell us whether that's intentional overbooking or a system sync issue — but Operations should know either way.
+32 rows in the OTB data show Boston occupancy above 100% — 26 concentrated around April 19–21, with 6 additional rows scattered across Jan, Mar, May, and Jun. Hotel_b has 238 rooms; these rows show 239–270 rooms sold. The data doesn't tell us whether that's intentional overbooking or a system sync issue — but Operations should know either way.
 
 ---
 
@@ -146,7 +146,7 @@ Three problems surfaced immediately after loading the data.
 Joining the events and booking tables naively produced 28,276 rows from a join that should have preserved the original 4,732 OTB rows — a 6× inflation. Each event row was attaching to every booking row for that date. Fixed by pre-aggregating events to one row per date before joining. If this had gone unnoticed, every forecast number downstream would have been wrong.
 
 **Boston showed rooms sold beyond capacity.**
-32 date-rows showed occupancy above 100% — more rooms sold than exist. Either real overbooking or a system error. Capped at 100% for forecasting, flagged to operations. This became Recommendation 3.
+32 rows showed occupancy above 100% — 26 concentrated around April 19–21, 6 scattered across other months. Hotel_b has 238 rooms; affected rows show 239–270 rooms sold. Either real overbooking or a system error. Capped at 100% for forecasting, flagged to operations. This became Recommendation 3.
 
 **Revenue math checked out.**
 ADR × rooms sold should equal revenue sold. Largest gap: $1.36. Rounding, not a problem. Accepted.
