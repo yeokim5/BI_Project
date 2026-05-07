@@ -36,6 +36,25 @@ Forecast RevPAR     =  Forecast Occupancy  ×  Current ADR
 
 Every number traces to a specific row. Nothing is a black box.
 
+#### How Pickup Rate Is Calculated
+
+Each business_date appears across multiple OTB snapshots — that progression is the booking curve for that stay date.
+
+1. **Track the booking curve** — observe how reservations accumulate across snapshots for each stay date
+2. **Define final demand** — use the closest snapshot to check-in (~5 days out) as the final demand proxy
+3. **Measure remaining pickup per bucket** — for each lead-time bucket (90d, 60d, 30d, 14d, 7d):
+   `remaining pickup = final booked rooms − rooms booked at that bucket` → converted to % of total rooms
+4. **Average across all dates** — repeat for every historical stay date, then average by bucket → one pickup curve per hotel
+
+#### How Event Weight Is Calculated
+
+Each stay date is matched to events in the same market. Visitor counts are aggregated, normalized by hotel size, then dampened and capped into an occupancy lift factor.
+
+1. **Match events** — find all events in the same market on that stay date
+2. **Sum visitors** — aggregate expected visitors across all matching events
+3. **Normalize by hotel size** — `visitor density = total visitors / total rooms` (demand pressure relative to capacity)
+4. **Convert to occupancy lift** — `event weight = visitor density / 1000` (damping: not every visitor stays at this hotel), capped at 15% to prevent mega-events from distorting the forecast
+
 ---
 
 ## What the Numbers Show
